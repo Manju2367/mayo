@@ -5,6 +5,7 @@
     "rootDir": "./electron",
     "outDir": "./dist-electron",
 
+
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
     "module": "nodenext",
@@ -40,5 +41,6 @@
     "noUncheckedSideEffectImports": true,
     "moduleDetection": "force",
     "skipLibCheck": true,
-  }
+  },
+  "include": ["electron/**/*.ts"],
 }
