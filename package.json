@@ -25,7 +25,25 @@
   "devDependencies": {
     "@types/node": "^26.6.1",
     "electron": "^44.4.2",
+    "electron-builder": "^26.15.3",
     "typescript": "^7.0.2",
     "vite": "^8.3.0"
+  },
+  "build": {
+    "appId": "jp.outlook.neco2367.mayo",
+    "productName": "Mayo",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "dist-electron/**/*"
+    ],
+    "extraMetadata": {
+      "main": "dist-electron/main.js"
+    }
+  },
+  "dependencies": {
+    "electron-log": "^5.4.4"
   }
 }
