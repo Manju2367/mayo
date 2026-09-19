@@ -1,4 +1,4 @@
-import { app, BrowserWindow, Tray, Menu } from 'electron'
+import { app, BrowserWindow, Tray, Menu, ipcMain } from 'electron'
 import path from 'node:path'
 import * as C from './constsns.js'
 
@@ -9,9 +9,15 @@ const createWindow = () => {
         title: C.appName,
         width: 960,
         height: 640,
-        fullscreen: true,
+        fullscreen: false,
         autoHideMenuBar: true,
-        transparent: false
+        transparent: false,
+        frame: true,
+        alwaysOnTop: false,
+        webPreferences: {
+            preload: path.join(C.__dirname, 'preload.js'),
+            nodeIntegration: true
+        }
     })
 
     if (app.isPackaged) {
@@ -21,9 +27,17 @@ const createWindow = () => {
     }
 }
 
+const send = (message: string) => {
+    console.log(message)
+}
+
 
 
 app.whenReady().then(() => {
+    ipcMain.handle('send', (e, message) => send(message))
+
+
+
     const tray = new Tray(path.join(C.__dirname, '../public/icon.png'))
     tray.setContextMenu(Menu.buildFromTemplate([
         {
