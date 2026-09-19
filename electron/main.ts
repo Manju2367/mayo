@@ -9,6 +9,7 @@ const createWindow = () => {
         title: C.appName,
         width: 960,
         height: 640,
+        fullscreen: true,
         autoHideMenuBar: true,
         transparent: false
     })
