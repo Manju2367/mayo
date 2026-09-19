@@ -1,0 +1,31 @@
+* {
+    box-sizing: border-box;
+}
+
+html {
+    width: 100%;
+    height: 100%;
+}
+
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+@font-face {
+    font-family: 'm plus medium';
+    src: url('./assets/fonts/MPLUS2-Medium.otf');
+}
+
+div#main-container {
+    width: 100%;
+    height: 100%;
+
+    textarea {
+        font-family: 'm plus medium';
+        font-size: 24px;
+        background-color: #ffffff;
+    }
+}
