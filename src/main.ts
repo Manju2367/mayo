@@ -14,4 +14,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         })
     }
+
+    // @ts-expect-error electron API
+    window.electron.onShow(() => {
+        if (elemMemo !== null && elemMemo instanceof HTMLTextAreaElement) {
+            elemMemo.focus()
+        }
+    })
 })

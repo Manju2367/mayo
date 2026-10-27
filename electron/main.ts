@@ -49,6 +49,8 @@ app.whenReady().then(() => {
                 mainWindow.hide()
             } else {
                 mainWindow.show()
+
+                mainWindow.webContents.send('show')
             }
         }
     })
