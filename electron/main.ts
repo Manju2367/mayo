@@ -1,6 +1,7 @@
 import { app, BrowserWindow, Tray, Menu, ipcMain, globalShortcut } from 'electron'
 import path from 'node:path'
 import * as C from './constsns.js'
+import type ElectronAPI from './shared/electron-api.js'
 
 
 
@@ -37,26 +38,27 @@ const createWindow = () => {
 
 
 // プロセス間通信
-
-const send = (message: string): void => {
-    console.log(message)
-}
-
-const log = (args: Array<any>): void => {
-    console.log(...args)
-}
-
-const hideWindow = (): void => {
-    mainWindow?.hide()
+const apiFuncs: Pick<ElectronAPI,
+        'log' | 'send' | 'hideWindow'
+    > = {
+    log: (args): void => {
+        console.log(...args)
+    },
+    send: (message) => {
+        console.log(message)
+    },
+    hideWindow: () => {
+        mainWindow?.hide()
+    }
 }
 
 
 
 app.whenReady().then(() => {
     // handle funcs
-    ipcMain.handle('log', (e, args: Array<any>) => log(args))
-    ipcMain.handle('send', (e, message) => send(message))
-    ipcMain.handle('hideWindow', (e) => hideWindow())
+    ipcMain.handle('log', (e, args: Array<any>) => apiFuncs.log(args))
+    ipcMain.handle('send', (e, message) => apiFuncs.send(message))
+    ipcMain.handle('hideWindow', (e) => apiFuncs.hideWindow())
 
 
 
