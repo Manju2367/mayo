@@ -42,5 +42,8 @@
     "moduleDetection": "force",
     "skipLibCheck": true,
   },
-  "include": ["electron/**/*.ts"],
+  "include": [
+    "electron/**/*.ts",
+    "electron/**/*.cts"
+  ],
 }

@@ -1,7 +1,6 @@
 import { app, BrowserWindow, Tray, Menu, ipcMain, globalShortcut } from 'electron'
 import path from 'node:path'
 import * as C from './constsns.js'
-import main from 'electron/main';
 
 
 
@@ -11,16 +10,16 @@ const createWindow = () => {
         title: C.appName,
         width: 960,
         height: 640,
-        fullscreen: false,
+        fullscreen: true,
         autoHideMenuBar: true,
-        transparent: false,
-        frame: true,
-        alwaysOnTop: false,
+        transparent: true,
+        frame: false,
+        alwaysOnTop: true,
         skipTaskbar: true,
         show: false,
         webPreferences: {
-            preload: path.join(C.__dirname, 'preload.js'),
-            nodeIntegration: true
+            contextIsolation: true,
+            preload: path.join(C.__dirname, 'preload.cjs')
         }
     })
 
