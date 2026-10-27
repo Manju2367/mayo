@@ -24,6 +24,12 @@ document.addEventListener('DOMContentLoaded', () => {
 })
 
 document.addEventListener('keydown', (e) => {
-    // @ts-expect-error electron API
-    window.electron.log(e.key)
+    switch (e.key) {
+        case 'Escape': {
+            // @ts-expect-error electron API
+            window.electron.hideWindow()
+
+            break
+        }
+    }
 })

@@ -23,12 +23,22 @@ const createWindow = () => {
         }
     })
 
+    mainWindow.on('blur', () => {
+        if (mainWindow !== null) {
+            mainWindow.hide()
+        }
+    })
+
     if (app.isPackaged) {
         mainWindow.loadFile(path.join(C.__dirname, '../dist/index.html'))
     } else {
         mainWindow.loadURL('http://localhost:5173/')
     }
 }
+
+
+
+// プロセス間通信
 
 const send = (message: string) => {
     console.log(message)
@@ -38,12 +48,19 @@ const log = (args: Array<any>) => {
     console.log(...args)
 }
 
+const hideWindow = () => {
+    if (mainWindow !== null) {
+        mainWindow.hide()
+    }
+}
+
 
 
 app.whenReady().then(() => {
     // handle funcs
     ipcMain.handle('log', (e, args: Array<any>) => log(args))
     ipcMain.handle('send', (e, message) => send(message))
+    ipcMain.handle('hideWindow', (e) => hideWindow())
 
 
 
