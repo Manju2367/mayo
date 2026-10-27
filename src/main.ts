@@ -1,6 +1,5 @@
 const send = (message: string) => {
-    // @ts-expect-error electron API
-    window.electron.send(message)
+    window.electronAPI.send(message)
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -15,8 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
         })
     }
 
-    // @ts-expect-error electron API
-    window.electron.onShow(() => {
+    window.electronAPI.onShow(() => {
         if (elemMemo instanceof HTMLTextAreaElement) {
             elemMemo.focus()
         }
@@ -26,8 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
 document.addEventListener('keydown', (e) => {
     switch (e.key) {
         case 'Escape': {
-            // @ts-expect-error electron API
-            window.electron.hideWindow()
+            window.electronAPI.hideWindow()
 
             break
         }

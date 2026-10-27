@@ -42,5 +42,9 @@
     "skipLibCheck": true,
 
     "moduleResolution": "bundler"
-  }
+  },
+  "include": [
+    "src/**.*.d.ts",
+    "shared/**.*.ts"
+  ]
 }

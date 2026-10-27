@@ -38,15 +38,15 @@ const createWindow = () => {
 
 // プロセス間通信
 
-const send = (message: string) => {
+const send = (message: string): void => {
     console.log(message)
 }
 
-const log = (args: Array<any>) => {
+const log = (args: Array<any>): void => {
     console.log(...args)
 }
 
-const hideWindow = () => {
+const hideWindow = (): void => {
     mainWindow?.hide()
 }
 

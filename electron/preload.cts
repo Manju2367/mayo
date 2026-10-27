@@ -1,11 +1,14 @@
 const { contextBridge, ipcRenderer } = require('electron')
+import type ElectronAPI from './shared/electron-api'
 
 
 
-contextBridge.exposeInMainWorld('electron', {
-    log: (args: Array<any>) => ipcRenderer.invoke('log', args),
-    send: (message: string) => ipcRenderer.invoke('send', message),
+const api: ElectronAPI = {
+    log: (args) => ipcRenderer.invoke('log', args),
+    send: (message) => ipcRenderer.invoke('send', message),
     hideWindow: () => ipcRenderer.invoke('hideWindow'),
 
-    onShow: (callback: Function) => ipcRenderer.on('show', (_event: any) => callback())
-})
+    onShow: (callback) => ipcRenderer.on('show', (_event: any) => callback())
+}
+
+contextBridge.exposeInMainWorld('electronAPI', api)
