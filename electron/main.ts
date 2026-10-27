@@ -69,6 +69,8 @@ app.whenReady().then(() => {
             createWindow()
         }
     })
+
+    console.log('app started.')
 })
 
 app.on('will-quit', () => {
