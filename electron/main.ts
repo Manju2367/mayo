@@ -24,9 +24,7 @@ const createWindow = () => {
     })
 
     mainWindow.on('blur', () => {
-        if (mainWindow !== null) {
-            mainWindow.hide()
-        }
+        mainWindow?.hide()
     })
 
     if (app.isPackaged) {
@@ -49,9 +47,7 @@ const log = (args: Array<any>) => {
 }
 
 const hideWindow = () => {
-    if (mainWindow !== null) {
-        mainWindow.hide()
-    }
+    mainWindow?.hide()
 }
 
 
@@ -66,14 +62,12 @@ app.whenReady().then(() => {
 
     // global shortcut
     globalShortcut.register('CommandOrControl+Alt+M', () => {
-        if (mainWindow !== null) {
-            if (mainWindow.isVisible()) {
-                mainWindow.hide()
-            } else {
-                mainWindow.show()
+        if (mainWindow?.isVisible()) {
+            mainWindow?.hide()
+        } else {
+            mainWindow?.show()
 
-                mainWindow.webContents.send('show')
-            }
+            mainWindow?.webContents.send('show')
         }
     })
 

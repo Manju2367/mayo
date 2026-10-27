@@ -6,7 +6,7 @@ const send = (message: string) => {
 document.addEventListener('DOMContentLoaded', () => {
     const elemMemo = document.getElementById('memo')
 
-    if (elemMemo !== null && elemMemo instanceof HTMLTextAreaElement) {
+    if (elemMemo instanceof HTMLTextAreaElement) {
         elemMemo.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && e.shiftKey) {
                 e.preventDefault()
@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // @ts-expect-error electron API
     window.electron.onShow(() => {
-        if (elemMemo !== null && elemMemo instanceof HTMLTextAreaElement) {
+        if (elemMemo instanceof HTMLTextAreaElement) {
             elemMemo.focus()
         }
     })
