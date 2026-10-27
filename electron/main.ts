@@ -1,11 +1,13 @@
-import { app, BrowserWindow, Tray, Menu, ipcMain } from 'electron'
+import { app, BrowserWindow, Tray, Menu, ipcMain, globalShortcut } from 'electron'
 import path from 'node:path'
 import * as C from './constsns.js'
+import main from 'electron/main';
 
 
 
+let mainWindow: BrowserWindow | null = null
 const createWindow = () => {
-    const mainWindow = new BrowserWindow({
+    mainWindow = new BrowserWindow({
         title: C.appName,
         width: 960,
         height: 640,
@@ -14,6 +16,8 @@ const createWindow = () => {
         transparent: false,
         frame: true,
         alwaysOnTop: false,
+        skipTaskbar: true,
+        show: false,
         webPreferences: {
             preload: path.join(C.__dirname, 'preload.js'),
             nodeIntegration: true
@@ -34,9 +38,21 @@ const send = (message: string) => {
 
 
 app.whenReady().then(() => {
+    // handle funcs
     ipcMain.handle('send', (e, message) => send(message))
 
 
+
+    // global shortcut
+    globalShortcut.register('CommandOrControl+Alt+M', () => {
+        if (mainWindow !== null) {
+            if (mainWindow.isVisible()) {
+                mainWindow.hide()
+            } else {
+                mainWindow.show()
+            }
+        }
+    })
 
     const tray = new Tray(path.join(C.__dirname, '../public/icon.png'))
     tray.setContextMenu(Menu.buildFromTemplate([
@@ -52,6 +68,10 @@ app.whenReady().then(() => {
             createWindow()
         }
     })
+})
+
+app.on('will-quit', () => {
+    globalShortcut.unregisterAll()
 })
 
 app.on('window-all-closed', () => {
