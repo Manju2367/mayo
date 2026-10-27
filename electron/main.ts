@@ -34,10 +34,15 @@ const send = (message: string) => {
     console.log(message)
 }
 
+const log = (args: Array<any>) => {
+    console.log(...args)
+}
+
 
 
 app.whenReady().then(() => {
     // handle funcs
+    ipcMain.handle('log', (e, args: Array<any>) => log(args))
     ipcMain.handle('send', (e, message) => send(message))
 
 

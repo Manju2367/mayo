@@ -22,3 +22,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     })
 })
+
+document.addEventListener('keydown', (e) => {
+    // @ts-expect-error electron API
+    window.electron.log(e.key)
+})
