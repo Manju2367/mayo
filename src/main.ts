@@ -1,3 +1,7 @@
+import './style.scss'
+
+
+
 const send = (message: string) => {
     window.electronAPI.send(message)
 }
