@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale
 <meta name="theme-color" content="#f5f6f8">
 <script type="module" src="main.ts"></script>
 <title>Mayo — クイックメモ</title>
@@ -17,7 +17,7 @@
                 <h1 id="memo-title">クイックメモ</h1>
             </div>
             <button class="icon-button close-button" id="close-button" type="button" aria-label="閉じる" title="閉じる (Esc)">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg>
+                <img class="close-button" src="./assets/images/close.svg" alt="X">         
             </button>
         </header>
 
@@ -36,7 +36,7 @@
                     <span class="shortcut"><kbd>Esc</kbd><span class="shortcut-label">閉じる</span></span>
                 </div>
                 <button class="save-button" id="save-button" type="button">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h12l4 4v14H3V3h2Zm2 0v6h10V3M7 21v-8h10v8" /></svg>
+                    <img src="./assets/images/save.svg" alt="S">                 
                     <span>保存</span>
                     <kbd>Ctrl S</kbd>
                 </button>
@@ -45,5 +45,8 @@
     </section>
     <p class="backdrop-tip">どこかをクリックするか <kbd>Esc</kbd> で閉じます</p>
 </main>
+</body>
+</html>
+
 </body>
 </html>

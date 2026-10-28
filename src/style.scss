@@ -113,7 +113,15 @@ h1 {
 }
 .close-button { margin-left: auto; }
 .icon-button:hover { background: #f1f1f5; color: #383d49; }
-svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.8; }
+img.close-button img.save-button { 
+    width: 18px; 
+    height: 18px; 
+    fill: none; 
+    stroke: currentColor; 
+    stroke-linecap: round; 
+    stroke-linejoin: round; 
+    stroke-width: 1.8; 
+}
 
 #memo {
     width: 100%;
@@ -178,7 +186,7 @@ kbd {
 }
 .save-button:hover { transform: translateY(-1px); background: #6257d8; }
 .save-button:active { transform: translateY(0); }
-.save-button svg { width: 15px; height: 15px; }
+.save-button img { width: 15px; height: 15px; }
 .save-button kbd { min-width: 43px; height: 20px; border-color: rgba(255,255,255,.23); background: rgba(255,255,255,.15); box-shadow: none; color: rgba(255,255,255,.9); font-size: 9px; }
 .backdrop-tip { margin: 0; color: rgba(255, 255, 255, 0.78); font-size: 11px; letter-spacing: 0.02em; -webkit-app-region: no-drag; }
 .backdrop-tip kbd { margin: 0 3px; border-color: rgba(255,255,255,.2); background: rgba(255,255,255,.12); box-shadow: none; color: #fff; }
