@@ -1,36 +1,52 @@
 import './style.scss'
 
+const memo = document.getElementById('memo')
+const saveButton = document.getElementById('save-button')
+const closeButton = document.getElementById('close-button')
+const saveStatus = document.getElementById('save-status')
+const characterCount = document.getElementById('character-count')
 
-
-const send = (message: string) => {
-    window.electronAPI.send(message)
+const updateCharacterCount = () => {
+    if (memo instanceof HTMLTextAreaElement && characterCount) {
+        characterCount.textContent = `${memo.value.length.toLocaleString('ja-JP')} 文字`
+    }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    const elemMemo = document.getElementById('memo')
+const saveMemo = () => {
+    if (!(memo instanceof HTMLTextAreaElement)) return
 
-    if (elemMemo instanceof HTMLTextAreaElement) {
-        elemMemo.addEventListener('keydown', (e) => {
-            if (e.key === 's' && e.ctrlKey) {
-                e.preventDefault()
-                send(elemMemo.value)
-            }
-        })
+    window.electronAPI.send(memo.value)
+
+    if (saveStatus) {
+        saveStatus.textContent = '保存しました'
+        saveStatus.classList.add('is-saved')
     }
+}
 
-    window.electronAPI.onShow(() => {
-        if (elemMemo instanceof HTMLTextAreaElement) {
-            elemMemo.focus()
+if (memo instanceof HTMLTextAreaElement) {
+    memo.addEventListener('input', () => {
+        updateCharacterCount()
+        if (saveStatus) {
+            saveStatus.textContent = '未保存の変更'
+            saveStatus.classList.remove('is-saved')
         }
     })
+
+    memo.addEventListener('keydown', (event) => {
+        if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') {
+            event.preventDefault()
+            saveMemo()
+        }
+    })
+}
+
+saveButton?.addEventListener('click', saveMemo)
+closeButton?.addEventListener('click', () => window.electronAPI.hideWindow())
+
+window.electronAPI.onShow(() => {
+    if (memo instanceof HTMLTextAreaElement) memo.focus()
 })
 
-document.addEventListener('keydown', (e) => {
-    switch (e.key) {
-        case 'Escape': {
-            window.electronAPI.hideWindow()
-
-            break
-        }
-    }
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') window.electronAPI.hideWindow()
 })

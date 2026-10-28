@@ -3,16 +3,47 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-
+<meta name="theme-color" content="#f5f6f8">
 <script type="module" src="main.ts"></script>
-
-<title>Mayo</title>
+<title>Mayo — クイックメモ</title>
 </head>
 <body>
+<main id="main-container" aria-label="クイックメモ">
+    <section class="memo-card" aria-labelledby="memo-title">
+        <header class="memo-header">
+            <div class="brand-mark" aria-hidden="true">m</div>
+            <div class="heading-copy">
+                <p class="eyebrow">MAYO / QUICK NOTE</p>
+                <h1 id="memo-title">クイックメモ</h1>
+            </div>
+            <button class="icon-button close-button" id="close-button" type="button" aria-label="閉じる" title="閉じる (Esc)">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg>
+            </button>
+        </header>
 
-<div id="main-container">
-    <textarea name="memo" id="memo" placeholder="メモ"></textarea>
-</div>
+        <label class="sr-only" for="memo">メモの内容</label>
+        <textarea name="memo" id="memo" placeholder="思いついたことを書き留める…" spellcheck="false" autofocus></textarea>
 
+        <footer class="memo-footer">
+            <div class="footer-meta">
+                <span class="save-status" id="save-status" role="status" aria-live="polite">すぐに書き始められます</span>
+                <span class="character-count" id="character-count">0 文字</span>
+            </div>
+            <div class="footer-actions">
+                <div class="shortcut-hint" aria-label="ショートカット">
+                    <span class="shortcut"><kbd>Ctrl</kbd><span>+</span><kbd>S</kbd><span class="shortcut-label">保存</span></span>
+                    <span class="shortcut-divider" aria-hidden="true"></span>
+                    <span class="shortcut"><kbd>Esc</kbd><span class="shortcut-label">閉じる</span></span>
+                </div>
+                <button class="save-button" id="save-button" type="button">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h12l4 4v14H3V3h2Zm2 0v6h10V3M7 21v-8h10v8" /></svg>
+                    <span>保存</span>
+                    <kbd>Ctrl S</kbd>
+                </button>
+            </div>
+        </footer>
+    </section>
+    <p class="backdrop-tip">どこかをクリックするか <kbd>Esc</kbd> で閉じます</p>
+</main>
 </body>
 </html>
