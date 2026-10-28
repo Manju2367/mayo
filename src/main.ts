@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (elemMemo instanceof HTMLTextAreaElement) {
         elemMemo.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && e.shiftKey) {
+            if (e.key === 's' && e.ctrlKey) {
                 e.preventDefault()
                 send(elemMemo.value)
             }
