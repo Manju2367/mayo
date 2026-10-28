@@ -44,7 +44,6 @@
     "moduleResolution": "bundler"
   },
   "include": [
-    "src/**.*.d.ts",
-    "shared/**.*.ts"
+    "src/**/*",
   ]
 }
