@@ -1,10 +1,13 @@
 import './style.scss'
 
+
+
 const memo = document.getElementById('memo')
 const saveButton = document.getElementById('save-button')
 const closeButton = document.getElementById('close-button')
 const saveStatus = document.getElementById('save-status')
 const characterCount = document.getElementById('character-count')
+const mainContainer = document.getElementById('main-container')
 
 const updateCharacterCount = () => {
     if (memo instanceof HTMLTextAreaElement && characterCount) {
@@ -23,6 +26,8 @@ const saveMemo = () => {
     }
 }
 
+
+
 if (memo instanceof HTMLTextAreaElement) {
     memo.addEventListener('input', () => {
         updateCharacterCount()
@@ -32,9 +37,9 @@ if (memo instanceof HTMLTextAreaElement) {
         }
     })
 
-    memo.addEventListener('keydown', (event) => {
-        if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') {
-            event.preventDefault()
+    memo.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+            e.preventDefault()
             saveMemo()
         }
     })
@@ -47,6 +52,6 @@ window.electronAPI.onShow(() => {
     if (memo instanceof HTMLTextAreaElement) memo.focus()
 })
 
-document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape') window.electronAPI.hideWindow()
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') window.electronAPI.hideWindow()
 })

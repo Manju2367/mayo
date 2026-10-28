@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale
-<meta name="theme-color" content="#f5f6f8">
-<script type="module" src="main.ts"></script>
-<title>Mayo — クイックメモ</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale">
+    <meta name="theme-color" content="#f5f6f8">
+    <script type="module" src="main.ts"></script>
+    <title>Mayo — クイックメモ</title>
 </head>
 <body>
+
 <main id="main-container" aria-label="クイックメモ">
     <section class="memo-card" aria-labelledby="memo-title">
         <header class="memo-header">
@@ -17,7 +18,7 @@
                 <h1 id="memo-title">クイックメモ</h1>
             </div>
             <button class="icon-button close-button" id="close-button" type="button" aria-label="閉じる" title="閉じる (Esc)">
-                <img class="close-button" src="./assets/images/close.svg" alt="X">         
+                <img class="close-button" src="./assets/images/close.svg" alt="X">
             </button>
         </header>
 
@@ -30,7 +31,7 @@
                 <span class="character-count" id="character-count">0 文字</span>
             </div>
             <div class="footer-actions">
-                <div class="shortcut-hint" aria-label="ショートカット">
+                <div class="shortcut-hint">
                     <span class="shortcut"><kbd>Ctrl</kbd><span>+</span><kbd>S</kbd><span class="shortcut-label">保存</span></span>
                     <span class="shortcut-divider" aria-hidden="true"></span>
                     <span class="shortcut"><kbd>Esc</kbd><span class="shortcut-label">閉じる</span></span>
@@ -43,10 +44,8 @@
             </div>
         </footer>
     </section>
-    <p class="backdrop-tip">どこかをクリックするか <kbd>Esc</kbd> で閉じます</p>
+    <p class="backdrop-tip"><kbd>Esc</kbd> で閉じます</p>
 </main>
-</body>
-</html>
 
 </body>
 </html>
