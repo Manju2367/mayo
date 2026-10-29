@@ -214,6 +214,48 @@ kbd {
 .save-button kbd { min-width: 43px; height: 20px; border-color: rgba(255,255,255,.23); background: rgba(255,255,255,.15); box-shadow: none; color: rgba(255,255,255,.9); font-size: 9px; }
 .backdrop-tip { margin: 0; color: rgba(255, 255, 255, 0.78); font-size: 11px; letter-spacing: 0.02em; -webkit-app-region: no-drag; }
 .backdrop-tip kbd { margin: 0 3px; border-color: rgba(255,255,255,.2); background: rgba(255,255,255,.12); box-shadow: none; color: #fff; }
+.page-shortcut-hint { margin-left: 12px; color: rgba(255, 255, 255, 0.58); }
+.note-list-card { gap: 0; }
+.note-list-header { padding-bottom: 22px; }
+.back-button {
+    display: inline-flex;
+    min-height: 38px;
+    align-items: center;
+    gap: 7px;
+    margin-left: auto;
+    padding: 0 12px;
+    border: 1px solid #e7e8ee;
+    border-radius: 9px;
+    background: #fff;
+    color: #626875;
+    cursor: pointer;
+    font-size: 11px;
+    transition: background 150ms ease, border-color 150ms ease;
+}
+.back-button:hover { border-color: #d9d6fa; background: #f8f7ff; }
+.note-table-wrap { min-height: 0; flex: 1; overflow: auto; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.note-table { width: 100%; border-collapse: collapse; table-layout: fixed; text-align: left; }
+.note-table th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    padding: 13px 14px;
+    background: #fff;
+    color: #858b98;
+    font-size: 10px;
+    font-weight: 500;
+}
+.note-table th:first-child { width: 62%; }
+.note-table th:last-child { width: 38%; }
+.note-table td { padding: 13px 14px; border-top: 1px solid #f0f1f4; font-size: 12px; }
+.note-table tbody tr { transition: background 120ms ease; }
+.note-table tbody tr:hover { background: #fafaff; }
+.note-name-cell { overflow: hidden; color: #303440; text-overflow: ellipsis; white-space: nowrap; }
+.note-date-cell { color: var(--muted); font-family: 'Segoe UI', 'Yu Gothic UI', sans-serif; font-size: 11px !important; white-space: nowrap; }
+.note-list-message { margin: 0; padding: 24px 14px; color: var(--muted); font-size: 12px; text-align: center; }
+.note-list-message.is-error { color: #bd5a5a; }
+.note-list-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 15px; color: var(--muted); font-size: 10px; }
+.note-list-footer kbd { margin-right: 4px; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 
 @media (max-width: 560px) {
@@ -223,6 +265,12 @@ kbd {
     #memo { padding: 16px 2px; font-size: 15px; }
     .footer-actions { align-items: flex-end; }
     .shortcut-hint { gap: 8px; }
+    .note-table th, .note-table td { padding-right: 8px; padding-left: 8px; }
+    .note-table th:first-child { width: 55%; }
+    .note-table th:last-child { width: 45%; }
+    .note-date-cell { font-size: 10px !important; }
+    .back-button { padding: 0 8px; font-size: 10px; }
+    .page-shortcut-hint { display: none; }
     .shortcut-label { display: none; }
     .save-button { gap: 6px; padding: 0 10px; }
     .backdrop-tip { font-size: 10px; }

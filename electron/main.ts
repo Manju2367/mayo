@@ -3,7 +3,7 @@ import path from 'node:path'
 import * as C from './constsns.js'
 import type ElectronAPI from './shared/electron-api.js'
 import { existsSync } from 'node:fs'
-import { mkdir, rename, writeFile } from 'node:fs/promises'
+import { mkdir, readdir, rename, stat, writeFile } from 'node:fs/promises'
 
 
 
@@ -80,7 +80,7 @@ const parseFilename = (filename: string): string => {
 
 // プロセス間通信
 const apiFuncs: Pick<ElectronAPI,
-        'log' | 'send' | 'hideWindow'
+        'log' | 'send' | 'listNotes' | 'hideWindow'
     > = {
     log: (args): void => {
         console.log(...args)
@@ -120,6 +120,26 @@ const apiFuncs: Pick<ElectronAPI,
         console.log(`ファイル ${ filename } を保存しました。`)
         return filename
     },
+    listNotes: async () => {
+        const notesPath = path.join(C.rootDir, 'notes')
+        if (!existsSync(notesPath)) return []
+
+        const entries = await readdir(notesPath, { withFileTypes: true })
+        const notes = await Promise.all(
+            entries
+                .filter((entry) => entry.isFile() && entry.name.toLowerCase().endsWith('.txt'))
+                .map(async (entry) => {
+                    const filePath = path.join(notesPath, entry.name)
+                    const fileStat = await stat(filePath)
+                    return {
+                        filename: entry.name,
+                        updatedAt: fileStat.mtimeMs
+                    }
+                })
+        )
+
+        return notes.sort((a, b) => b.updatedAt - a.updatedAt)
+    },
     hideWindow: () => {
         mainWindow?.hide()
     }
@@ -133,6 +153,7 @@ app.whenReady().then(() => {
     ipcMain.handle('send', (e, message: string, currentFilename: string | null) =>
         apiFuncs.send(message, currentFilename)
     )
+    ipcMain.handle('listNotes', () => apiFuncs.listNotes())
     ipcMain.handle('hideWindow', (e) => apiFuncs.hideWindow())
 
 

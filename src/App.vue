@@ -1,11 +1,14 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
 import MemoEditor from './components/MemoEditor.vue'
 import MemoFooter from './components/MemoFooter.vue'
 import MemoHeader from './components/MemoHeader.vue'
+import NoteListPage from './components/NoteListPage.vue'
 
+const currentPage = ref<'memo' | 'list'>('memo')
 const memo = ref('')
 const memoEditor = ref<{ focus: () => void } | null>(null)
+const noteListPage = ref<{ focus: () => void } | null>(null)
 const currentFilename = ref<string | null>(null)
 const lastSavedContent = ref<string | null>(null)
 const isSaving = ref(false)
@@ -51,14 +54,50 @@ const handleInput = () => {
 
 const hideWindow = () => window.electronAPI.hideWindow()
 
+const showNoteList = async () => {
+    currentPage.value = 'list'
+    await nextTick()
+    noteListPage.value?.focus()
+}
+
+const returnToMemo = async () => {
+    currentPage.value = 'memo'
+    await nextTick()
+    memoEditor.value?.focus()
+}
+
 const handleWindowKeydown = (event: KeyboardEvent) => {
-    if (event.key === 'Tab') event.preventDefault()
-    if (event.key === 'Escape') hideWindow()
+    if (event.isComposing) return
+
+    const key = event.key.toLowerCase()
+    const hasModifier = event.ctrlKey || event.metaKey
+
+    if (hasModifier && key === 'l') {
+        event.preventDefault()
+        if (currentPage.value === 'memo') void showNoteList()
+        else void returnToMemo()
+        return
+    }
+
+    if (hasModifier && key === 's') {
+        event.preventDefault()
+        return
+    }
+
+    if (currentPage.value === 'memo' && event.key === 'Tab') event.preventDefault()
+
+    if (event.key === 'Escape') {
+        if (currentPage.value === 'list') void returnToMemo()
+        else hideWindow()
+    }
 }
 
 onMounted(() => {
     window.addEventListener('keydown', handleWindowKeydown)
-    window.electronAPI.onShow(() => memoEditor.value?.focus())
+    window.electronAPI.onShow(() => {
+        if (currentPage.value === 'list') noteListPage.value?.focus()
+        else memoEditor.value?.focus()
+    })
     memoEditor.value?.focus()
 })
 
@@ -68,8 +107,12 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <main id="main-container" aria-label="クイックメモ" @click.self="hideWindow">
-        <section class="memo-card" aria-labelledby="memo-title">
+    <main
+        id="main-container"
+        :aria-label="currentPage === 'memo' ? 'クイックメモ' : '保存したメモ'"
+        @click.self="hideWindow"
+    >
+        <section v-if="currentPage === 'memo'" class="memo-card" aria-labelledby="memo-title">
             <MemoHeader
                 :filename="currentFilename"
                 :is-dirty="isDirty"
@@ -89,6 +132,15 @@ onUnmounted(() => {
                 @save="saveMemo"
             />
         </section>
-        <p class="backdrop-tip"><kbd>Esc</kbd> で閉じます</p>
+        <NoteListPage
+            v-else
+            ref="noteListPage"
+            @back="returnToMemo"
+        />
+        <p class="backdrop-tip">
+            <kbd>Esc</kbd>
+            {{ currentPage === 'list' ? 'メモへ戻る' : '閉じる' }}
+            <span class="page-shortcut-hint"><kbd>Ctrl</kbd>+<kbd>L</kbd> {{ currentPage === 'list' ? 'メモへ戻る' : '一覧' }}</span>
+        </p>
     </main>
 </template>
