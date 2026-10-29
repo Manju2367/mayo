@@ -138,9 +138,20 @@ onMounted(() => {
             <p v-else-if="isOpening" class="note-list-message" role="status">メモを開いています…</p>
         </div>
 
-        <footer class="note-list-footer">
-            <span>更新日時の新しい順</span>
-            <span><kbd>↑</kbd><kbd>↓</kbd> 選択 <kbd>Enter</kbd> 開く <kbd>Ctrl</kbd>+<kbd>N</kbd> 新規</span>
+        <footer class="memo-footer note-list-footer">
+            <div class="footer-meta">
+                <span>更新日時の新しい順</span>
+                <span>{{ notes.length }} 件</span>
+            </div>
+            <div class="footer-actions">
+                <div class="shortcut-hint">
+                    <span class="shortcut"><kbd>↑</kbd><span>+</span><kbd>↓</kbd><span class="shortcut-label">選択</span></span>
+                    <span class="shortcut-divider" aria-hidden="true"></span>
+                    <span class="shortcut"><kbd>Enter</kbd><span class="shortcut-label">開く</span></span>
+                    <span class="shortcut-divider" aria-hidden="true"></span>
+                    <span class="shortcut"><kbd>Ctrl</kbd><span>+</span><kbd>N</kbd><span class="shortcut-label">新規</span></span>
+                </div>
+            </div>
         </footer>
     </section>
 </template>

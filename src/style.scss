@@ -168,6 +168,7 @@ img.close-button img.save-button {
 
 .memo-footer { display: grid; gap: 16px; padding-top: 17px; }
 .footer-meta, .footer-actions { display: flex; align-items: center; justify-content: space-between; }
+.footer-meta { color: var(--muted); font-size: 11px; }
 .save-status, .character-count { color: var(--muted); font-size: 11px; }
 .save-status { transition: color 150ms ease; }
 .save-status.is-saved { color: #3b9a72; }
@@ -269,8 +270,6 @@ kbd {
 .note-date-cell { color: var(--muted); font-family: 'Segoe UI', 'Yu Gothic UI', sans-serif; font-size: 11px !important; white-space: nowrap; }
 .note-list-message { margin: 0; padding: 24px 14px; color: var(--muted); font-size: 12px; text-align: center; }
 .note-list-message.is-error { color: #bd5a5a; }
-.note-list-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 15px; color: var(--muted); font-size: 10px; }
-.note-list-footer kbd { margin-right: 4px; }
 .dialog-backdrop {
     position: fixed;
     z-index: 10;
