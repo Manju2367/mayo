@@ -229,7 +229,23 @@ kbd {
     transition: background 150ms ease, border-color 150ms ease;
 }
 .back-button:hover { border-color: #eadb9e; background: #fffaf0; }
-.note-table-wrap { min-height: 0; flex: 1; overflow: auto; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.note-table-wrap {
+    min-height: 0;
+    flex: 1;
+    overflow: auto;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    scrollbar-color: #d9a08e #fff7df;
+    scrollbar-width: thin;
+}
+.note-table-wrap::-webkit-scrollbar { width: 9px; height: 9px; }
+.note-table-wrap::-webkit-scrollbar-track { background: #fff7df; }
+.note-table-wrap::-webkit-scrollbar-thumb {
+    border: 2px solid #fff7df;
+    border-radius: 8px;
+    background: #d9a08e;
+}
+.note-table-wrap::-webkit-scrollbar-thumb:hover { background: var(--accent); }
 .note-table { width: 100%; border-collapse: collapse; table-layout: fixed; text-align: left; }
 .note-table th {
     position: sticky;
