@@ -7,8 +7,6 @@ import { mkdir, readFile, readdir, rename, stat, writeFile } from 'node:fs/promi
 
 
 
-console.log(C.rootDir)
-
 let mainWindow: BrowserWindow | null = null
 const createWindow = () => {
     mainWindow = new BrowserWindow({
