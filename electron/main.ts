@@ -180,7 +180,7 @@ app.whenReady().then(() => {
         }
     })
 
-    const tray = new Tray(path.join(C.__dirname, '../public/icon.png'))
+    const tray = new Tray(path.join(C.__dirname, '../public/icon-512.png'))
     tray.setContextMenu(Menu.buildFromTemplate([
         {
             label: '終了',

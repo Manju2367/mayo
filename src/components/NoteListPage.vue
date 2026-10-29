@@ -2,6 +2,8 @@
 import { nextTick, onMounted, ref } from 'vue'
 import type { NoteDocument, NoteSummary } from '../../electron/shared/electron-api'
 
+const brandIcon = `${import.meta.env.BASE_URL}icon-bg-512.png`
+
 const emit = defineEmits<{
     back: []
     open: [note: NoteDocument]
@@ -84,7 +86,7 @@ onMounted(() => {
 <template>
     <section ref="panel" class="memo-card note-list-card" aria-labelledby="notes-title" tabindex="-1" @keydown="handleListKeydown">
         <header class="memo-header note-list-header">
-            <div class="brand-mark" aria-hidden="true">m</div>
+            <img class="brand-mark" :src="brandIcon" alt="">
             <div class="heading-copy">
                 <p class="eyebrow">MAYO / YOUR NOTES</p>
                 <h1 id="notes-title">保存したメモ</h1>

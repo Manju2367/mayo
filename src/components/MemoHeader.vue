@@ -1,4 +1,6 @@
 <script setup lang="ts">
+const brandIcon = `${import.meta.env.BASE_URL}icon-bg-512.png`
+
 defineProps<{
     filename: string | null
     isDirty: boolean
@@ -11,7 +13,7 @@ defineEmits<{
 
 <template>
     <header class="memo-header">
-        <div class="brand-mark" aria-hidden="true">m</div>
+        <img class="brand-mark" :src="brandIcon" alt="">
         <div class="heading-copy">
             <p class="eyebrow">MAYO / QUICK NOTE</p>
             <h1 id="memo-title">クイックメモ</h1>
