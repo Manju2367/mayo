@@ -38,6 +38,13 @@ if (memo instanceof HTMLTextAreaElement) {
     })
 
     memo.addEventListener('keydown', (e) => {
+        if (e.key === 'Tab') {
+            e.preventDefault()
+            memo.setRangeText('\t', memo.selectionStart, memo.selectionEnd, 'end')
+            memo.dispatchEvent(new Event('input', { bubbles: true }))
+            return
+        }
+
         if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
             e.preventDefault()
             saveMemo()
@@ -53,5 +60,6 @@ window.electronAPI.onShow(() => {
 })
 
 document.addEventListener('keydown', (e) => {
+    if (e.key === 'Tab') e.preventDefault()
     if (e.key === 'Escape') window.electronAPI.hideWindow()
 })
