@@ -5,7 +5,7 @@ import type ElectronAPI from './shared/electron-api'
 
 const api: ElectronAPI = {
     log: (args) => ipcRenderer.invoke('log', args),
-    send: (message) => ipcRenderer.invoke('send', message),
+    send: (note) => ipcRenderer.invoke('send', note),
     hideWindow: () => ipcRenderer.invoke('hideWindow'),
 
     onShow: (callback) => ipcRenderer.on('show', (_event: any) => callback())
