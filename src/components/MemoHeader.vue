@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const brandIcon = `${import.meta.env.BASE_URL}icon-bg-512.png`
+import PageHeading from './PageHeading.vue'
 
 defineProps<{
     filename: string | null
@@ -13,21 +13,20 @@ defineEmits<{
 
 <template>
     <header class="memo-header">
-        <img class="brand-mark" :src="brandIcon" alt="">
-        <div class="heading-copy">
-            <p class="eyebrow">MAYO / QUICK NOTE</p>
-            <h1 id="memo-title">クイックメモ</h1>
-            <div v-if="filename" class="document-label-row">
-                <p class="document-filename" :title="filename">{{ filename }}</p>
-                <span
-                    v-if="isDirty"
-                    class="unsaved-indicator"
-                    role="img"
-                    aria-label="未保存の変更があります"
-                    title="未保存の変更があります"
-                ></span>
-            </div>
-        </div>
+        <PageHeading eyebrow="MAYO / QUICK NOTE" title="クイックメモ" title-id="memo-title">
+            <template #below>
+                <div v-if="filename" class="document-label-row">
+                    <p class="document-filename" :title="filename">{{ filename }}</p>
+                    <span
+                        v-if="isDirty"
+                        class="unsaved-indicator"
+                        role="img"
+                        aria-label="未保存の変更があります"
+                        title="未保存の変更があります"
+                    ></span>
+                </div>
+            </template>
+        </PageHeading>
         <button
             class="icon-button close-button"
             type="button"

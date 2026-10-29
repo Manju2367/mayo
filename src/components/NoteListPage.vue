@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { nextTick, onMounted, ref } from 'vue'
 import type { NoteDocument, NoteSummary } from '../../electron/shared/electron-api'
-
-const brandIcon = `${import.meta.env.BASE_URL}icon-bg-512.png`
+import PageHeading from './PageHeading.vue'
 
 const emit = defineEmits<{
     back: []
@@ -58,7 +57,24 @@ const selectNote = async (index: number, shouldFocus = false) => {
     selectedIndex.value = (index + notes.value.length) % notes.value.length
     if (shouldFocus) {
         await nextTick()
-        panel.value?.querySelector<HTMLButtonElement>(`[data-note-index="${selectedIndex.value}"]`)?.focus()
+        const button = panel.value?.querySelector<HTMLButtonElement>(`[data-note-index="${selectedIndex.value}"]`)
+        const scrollArea = panel.value?.querySelector<HTMLElement>('.note-table-wrap')
+        const row = button?.closest('tr')
+
+        button?.focus({ preventScroll: true })
+        if (!button || !scrollArea || !row) return
+
+        const areaRect = scrollArea.getBoundingClientRect()
+        const rowRect = row.getBoundingClientRect()
+        const stickyHeaderHeight = scrollArea.querySelector('thead')?.getBoundingClientRect().height ?? 0
+        const visibleTop = areaRect.top + stickyHeaderHeight
+        const visibleBottom = areaRect.bottom
+
+        if (rowRect.top < visibleTop) {
+            scrollArea.scrollTop -= visibleTop - rowRect.top
+        } else if (rowRect.bottom > visibleBottom) {
+            scrollArea.scrollTop += rowRect.bottom - visibleBottom
+        }
     }
 }
 
@@ -86,11 +102,7 @@ onMounted(() => {
 <template>
     <section ref="panel" class="memo-card note-list-card" aria-labelledby="notes-title" tabindex="-1" @keydown="handleListKeydown">
         <header class="memo-header note-list-header">
-            <img class="brand-mark" :src="brandIcon" alt="">
-            <div class="heading-copy">
-                <p class="eyebrow">MAYO / YOUR NOTES</p>
-                <h1 id="notes-title">保存したメモ</h1>
-            </div>
+            <PageHeading eyebrow="MAYO / YOUR NOTES" title="保存したメモ" title-id="notes-title" />
             <button class="back-button" type="button" @click="$emit('back')">
                 <span aria-hidden="true">←</span>
                 <span>メモへ戻る</span>

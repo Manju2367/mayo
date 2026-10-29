@@ -69,11 +69,21 @@ button { -webkit-app-region: no-drag; }
     padding-bottom: 24px;
 }
 
+.page-heading {
+    display: flex;
+    min-width: 0;
+    flex: 1 1 auto;
+    align-items: flex-start;
+    gap: 14px;
+}
 .brand-mark {
     display: block;
     width: 42px;
     height: 42px;
-    flex: 0 0 auto;
+    min-width: 42px;
+    min-height: 42px;
+    flex: 0 0 42px;
+    aspect-ratio: 1;
     border-radius: 12px;
     object-fit: contain;
 }
