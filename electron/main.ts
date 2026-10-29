@@ -2,7 +2,8 @@ import { app, BrowserWindow, Tray, Menu, ipcMain, globalShortcut } from 'electro
 import path from 'node:path'
 import * as C from './constsns.js'
 import type ElectronAPI from './shared/electron-api.js'
-import { existsSync, mkdirSync, writeFile } from 'node:fs'
+import { existsSync } from 'node:fs'
+import { mkdir, rename, writeFile } from 'node:fs/promises'
 
 
 
@@ -84,17 +85,40 @@ const apiFuncs: Pick<ElectronAPI,
     log: (args): void => {
         console.log(...args)
     },
-    send: (note) => {
+    send: async (note, currentFilename) => {
         const notesPath = path.join(C.rootDir, 'notes')
+        await mkdir(notesPath, { recursive: true })
 
-        if (!existsSync(notesPath))
-            mkdirSync(notesPath)
+        if (currentFilename !== null && path.basename(currentFilename) !== currentFilename)
+            throw new Error('Invalid current filename')
 
-        const title = parseFilename(note.split('\n')[0] ?? '')
+        const firstLine = note.split('\n')[0] ?? ''
+        const title = currentFilename !== null && firstLine.match(/^\s*$/)
+            ? path.parse(currentFilename).name
+            : parseFilename(firstLine)
         const filename = `${ title }.txt`
-        writeFile(path.join(notesPath, filename), note, 'utf-8', () => {
-            console.log(`ファイル ${ filename } を保存しました。`)
-        })
+        const nextPath = path.join(notesPath, filename)
+        const currentPath = currentFilename === null
+            ? null
+            : path.join(notesPath, currentFilename)
+
+        if (currentPath !== null && currentFilename !== filename) {
+            if (existsSync(nextPath))
+                throw new Error(`ファイル ${ filename } は既に存在します。`)
+
+            await rename(currentPath, nextPath)
+            try {
+                await writeFile(nextPath, note, 'utf-8')
+            } catch (error) {
+                await rename(nextPath, currentPath).catch(() => undefined)
+                throw error
+            }
+        } else {
+            await writeFile(nextPath, note, 'utf-8')
+        }
+
+        console.log(`ファイル ${ filename } を保存しました。`)
+        return filename
     },
     hideWindow: () => {
         mainWindow?.hide()
@@ -106,7 +130,9 @@ const apiFuncs: Pick<ElectronAPI,
 app.whenReady().then(() => {
     // handle funcs
     ipcMain.handle('log', (e, args: Array<any>) => apiFuncs.log(args))
-    ipcMain.handle('send', (e, message) => apiFuncs.send(message))
+    ipcMain.handle('send', (e, message: string, currentFilename: string | null) =>
+        apiFuncs.send(message, currentFilename)
+    )
     ipcMain.handle('hideWindow', (e) => apiFuncs.hideWindow())
 
 

@@ -18,6 +18,7 @@
 }
 
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 
 html, body {
     width: 100%;
@@ -81,7 +82,29 @@ button { -webkit-app-region: no-drag; }
     line-height: 1;
 }
 
-.heading-copy { display: grid; gap: 1px; }
+.heading-copy { display: grid; min-width: 0; gap: 2px; }
+.document-label-row { display: flex; min-width: 0; align-items: center; gap: 7px; }
+.document-filename {
+    max-width: min(56vw, 420px);
+    min-width: 0;
+    margin: 1px 0 0;
+    overflow: hidden;
+    color: var(--muted);
+    font-family: 'Segoe UI', 'Yu Gothic UI', sans-serif;
+    font-size: 11px;
+    line-height: 1.4;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.unsaved-indicator {
+    display: inline-block;
+    flex: 0 0 auto;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #e4a04f;
+    box-shadow: 0 0 0 2px rgba(228, 160, 79, 0.15);
+}
 .eyebrow {
     margin: 0;
     color: #969ba6;
