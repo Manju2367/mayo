@@ -16,7 +16,7 @@ const lastSavedContent = ref<string | null>(null)
 const isSaving = ref(false)
 const saveStatus = ref('すぐに書き始められます')
 const saveSucceeded = ref(false)
-const pendingNote = ref<NoteDocument | null>(null)
+const pendingAction = ref<{ type: 'open'; note: NoteDocument } | { type: 'new' } | null>(null)
 
 const characterCount = computed(() => `${memo.value.length.toLocaleString('ja-JP')} 文字`)
 const isDirty = computed(() =>
@@ -70,7 +70,7 @@ const returnToMemo = async () => {
 }
 
 const applyOpenNote = async (note: NoteDocument) => {
-    pendingNote.value = null
+    pendingAction.value = null
     memo.value = note.content
     currentFilename.value = note.filename
     lastSavedContent.value = note.content
@@ -81,7 +81,7 @@ const applyOpenNote = async (note: NoteDocument) => {
 
 const openNote = async (note: NoteDocument) => {
     if (isDirty.value) {
-        pendingNote.value = note
+        pendingAction.value = { type: 'open', note }
         await nextTick()
         return
     }
@@ -89,24 +89,47 @@ const openNote = async (note: NoteDocument) => {
     await applyOpenNote(note)
 }
 
-const cancelOpenNote = async () => {
-    pendingNote.value = null
-    await nextTick()
-    noteListPage.value?.focus()
+const applyNewMemo = async () => {
+    pendingAction.value = null
+    memo.value = ''
+    currentFilename.value = null
+    lastSavedContent.value = null
+    saveSucceeded.value = false
+    saveStatus.value = 'すぐに書き始められます'
+    await returnToMemo()
 }
 
-const confirmOpenNote = async () => {
-    const note = pendingNote.value
-    if (note) await applyOpenNote(note)
+const createNewMemo = async () => {
+    if (isDirty.value) {
+        pendingAction.value = { type: 'new' }
+        await nextTick()
+        return
+    }
+
+    await applyNewMemo()
+}
+
+const cancelPendingAction = async () => {
+    pendingAction.value = null
+    await nextTick()
+    if (currentPage.value === 'list') noteListPage.value?.focus()
+    else memoEditor.value?.focus()
+}
+
+const confirmPendingAction = async () => {
+    const action = pendingAction.value
+    if (!action) return
+    if (action.type === 'open') await applyOpenNote(action.note)
+    else await applyNewMemo()
 }
 
 const handleWindowKeydown = (event: KeyboardEvent) => {
     if (event.isComposing) return
 
-    if (pendingNote.value) {
+    if (pendingAction.value) {
         if (event.key === 'Escape') {
             event.preventDefault()
-            void cancelOpenNote()
+            void cancelPendingAction()
         }
         return
     }
@@ -118,6 +141,12 @@ const handleWindowKeydown = (event: KeyboardEvent) => {
         event.preventDefault()
         if (currentPage.value === 'memo') void showNoteList()
         else void returnToMemo()
+        return
+    }
+
+    if (hasModifier && key === 'n') {
+        event.preventDefault()
+        void createNewMemo()
         return
     }
 
@@ -181,10 +210,11 @@ onUnmounted(() => {
             @open="openNote"
         />
         <ConfirmDiscardDialog
-            v-if="pendingNote"
-            :filename="pendingNote.filename"
-            @cancel="cancelOpenNote"
-            @confirm="confirmOpenNote"
+            v-if="pendingAction"
+            :mode="pendingAction.type"
+            :filename="pendingAction.type === 'open' ? pendingAction.note.filename : undefined"
+            @cancel="cancelPendingAction"
+            @confirm="confirmPendingAction"
         />
         <p class="backdrop-tip">
             <kbd>Esc</kbd>

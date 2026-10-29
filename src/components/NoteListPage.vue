@@ -140,7 +140,7 @@ onMounted(() => {
 
         <footer class="note-list-footer">
             <span>更新日時の新しい順</span>
-            <span><kbd>↑</kbd><kbd>↓</kbd> 選択 <kbd>Enter</kbd> 開く</span>
+            <span><kbd>↑</kbd><kbd>↓</kbd> 選択 <kbd>Enter</kbd> 開く <kbd>Ctrl</kbd>+<kbd>N</kbd> 新規</span>
         </footer>
     </section>
 </template>

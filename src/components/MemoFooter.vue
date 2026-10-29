@@ -21,6 +21,8 @@ defineEmits<{
             <div class="shortcut-hint">
                 <span class="shortcut"><kbd>Ctrl</kbd><span>+</span><kbd>S</kbd><span class="shortcut-label">保存</span></span>
                 <span class="shortcut-divider" aria-hidden="true"></span>
+                <span class="shortcut"><kbd>Ctrl</kbd><span>+</span><kbd>N</kbd><span class="shortcut-label">新規</span></span>
+                <span class="shortcut-divider" aria-hidden="true"></span>
                 <span class="shortcut"><kbd>Esc</kbd><span class="shortcut-label">閉じる</span></span>
             </div>
             <button class="save-button" type="button" :disabled="isSaving" @click="$emit('save')">
