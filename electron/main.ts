@@ -6,6 +6,8 @@ import { existsSync, mkdirSync, writeFile } from 'node:fs'
 
 
 
+console.log(C.rootDir)
+
 let mainWindow: BrowserWindow | null = null
 const createWindow = () => {
     mainWindow = new BrowserWindow({
@@ -83,11 +85,10 @@ const apiFuncs: Pick<ElectronAPI,
         console.log(...args)
     },
     send: (note) => {
-        // console.log(note)
+        const notesPath = path.join(C.rootDir, 'notes')
 
-        const notesPath = path.join(C.__dirname, '../notes')
-
-        if (!existsSync(notesPath)) mkdirSync(notesPath)
+        if (!existsSync(notesPath))
+            mkdirSync(notesPath)
 
         const title = parseFilename(note.split('\n')[0] ?? '')
         const filename = `${ title }.txt`
