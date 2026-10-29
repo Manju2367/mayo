@@ -222,6 +222,7 @@ kbd {
 .backdrop-tip kbd { margin: 0 3px; border-color: rgba(255,255,255,.2); background: rgba(255,255,255,.12); box-shadow: none; color: #fff; }
 .page-shortcut-hint { margin-left: 12px; color: rgba(255, 255, 255, 0.58); }
 .note-list-card { gap: 0; }
+.note-list-card:focus { outline: none; }
 .note-list-header { padding-bottom: 22px; }
 .back-button {
     display: inline-flex;
