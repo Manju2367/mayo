@@ -65,6 +65,11 @@ const parseFilename = (filename: string): string => {
     if (reservedWords.includes(filename.toLowerCase()))
         return filename + '_'
 
+    // ファイル名の文字数制限
+    if (filename.length > 20) {
+        filename = filename.slice(0, 19) + '…'
+    } 
+
     return filename
 }
 
