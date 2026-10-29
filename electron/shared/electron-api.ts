@@ -1,7 +1,7 @@
 export default interface ElectronAPI {
     // funcs
     log(...args: Array<any>): void,
-    send(message: string): void,
+    send(note: string): void,
     hideWindow(): void,
 
     // events

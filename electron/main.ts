@@ -2,6 +2,7 @@ import { app, BrowserWindow, Tray, Menu, ipcMain, globalShortcut } from 'electro
 import path from 'node:path'
 import * as C from './constsns.js'
 import type ElectronAPI from './shared/electron-api.js'
+import { existsSync, mkdirSync, writeFile } from 'node:fs'
 
 
 
@@ -35,6 +36,38 @@ const createWindow = () => {
     }
 }
 
+const generateTimestamp = (): string => {
+    return new Date()
+        .toLocaleString()
+        .replaceAll('/', '-')
+        .replaceAll(':', '')
+}
+
+const parseFilename = (filename: string): string => {
+    const invalidChars = /[/\?<>\\:\*|"]/g
+    const reservedWords = [
+        'com1', 'com2', 'com3', 'com4', 'com5', 'com6', 'com7', 'com8', 'com9',
+        'lpt1', 'lpt2', 'lpt3', 'lpt4', 'lpt5', 'lpt6', 'lpt7', 'lpt8', 'lpt9',
+        'con', 'nul', 'prn', 'aux'
+    ]
+
+    // 禁止文字
+    filename = filename.replaceAll(invalidChars, '')
+
+    // 末尾の.を削除
+    filename = filename.replace(/[. ]+$/, '')
+
+    // 空文字
+    if (filename.match(/^\s*$/))
+        return generateTimestamp()
+
+    // 予約語
+    if (reservedWords.includes(filename.toLowerCase()))
+        return filename + '_'
+
+    return filename
+}
+
 
 
 // プロセス間通信
@@ -44,8 +77,18 @@ const apiFuncs: Pick<ElectronAPI,
     log: (args): void => {
         console.log(...args)
     },
-    send: (message) => {
-        console.log(message)
+    send: (note) => {
+        // console.log(note)
+
+        const notesPath = path.join(C.__dirname, '../notes')
+
+        if (!existsSync(notesPath)) mkdirSync(notesPath)
+
+        const title = parseFilename(note.split('\n')[0] ?? '')
+        const filename = `${ title }.txt`
+        writeFile(path.join(notesPath, filename), note, 'utf-8', () => {
+            console.log(`ファイル ${ filename } を保存しました。`)
+        })
     },
     hideWindow: () => {
         mainWindow?.hide()
