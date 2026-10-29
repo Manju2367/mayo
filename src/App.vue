@@ -4,6 +4,7 @@ import MemoEditor from './components/MemoEditor.vue'
 import MemoFooter from './components/MemoFooter.vue'
 import MemoHeader from './components/MemoHeader.vue'
 import NoteListPage from './components/NoteListPage.vue'
+import type { NoteDocument } from '../electron/shared/electron-api'
 
 const currentPage = ref<'memo' | 'list'>('memo')
 const memo = ref('')
@@ -17,7 +18,7 @@ const saveSucceeded = ref(false)
 
 const characterCount = computed(() => `${memo.value.length.toLocaleString('ja-JP')} 文字`)
 const isDirty = computed(() =>
-    lastSavedContent.value === null || memo.value !== lastSavedContent.value
+    lastSavedContent.value === null ? memo.value.length > 0 : memo.value !== lastSavedContent.value
 )
 
 const saveMemo = async () => {
@@ -64,6 +65,21 @@ const returnToMemo = async () => {
     currentPage.value = 'memo'
     await nextTick()
     memoEditor.value?.focus()
+}
+
+const openNote = async (note: NoteDocument) => {
+    if (isDirty.value && !window.confirm('編集中のメモは保存されていません。破棄して別のメモを開きますか？')) {
+        await nextTick()
+        noteListPage.value?.focus()
+        return
+    }
+
+    memo.value = note.content
+    currentFilename.value = note.filename
+    lastSavedContent.value = note.content
+    saveSucceeded.value = true
+    saveStatus.value = '保存済み'
+    await returnToMemo()
 }
 
 const handleWindowKeydown = (event: KeyboardEvent) => {
@@ -136,6 +152,7 @@ onUnmounted(() => {
             v-else
             ref="noteListPage"
             @back="returnToMemo"
+            @open="openNote"
         />
         <p class="backdrop-tip">
             <kbd>Esc</kbd>

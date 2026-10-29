@@ -3,7 +3,7 @@ import path from 'node:path'
 import * as C from './constsns.js'
 import type ElectronAPI from './shared/electron-api.js'
 import { existsSync } from 'node:fs'
-import { mkdir, readdir, rename, stat, writeFile } from 'node:fs/promises'
+import { mkdir, readFile, readdir, rename, stat, writeFile } from 'node:fs/promises'
 
 
 
@@ -80,7 +80,7 @@ const parseFilename = (filename: string): string => {
 
 // プロセス間通信
 const apiFuncs: Pick<ElectronAPI,
-        'log' | 'send' | 'listNotes' | 'hideWindow'
+        'log' | 'send' | 'listNotes' | 'openNote' | 'hideWindow'
     > = {
     log: (args): void => {
         console.log(...args)
@@ -140,6 +140,18 @@ const apiFuncs: Pick<ElectronAPI,
 
         return notes.sort((a, b) => b.updatedAt - a.updatedAt)
     },
+    openNote: async (filename) => {
+        if (
+            path.basename(filename) !== filename ||
+            !filename.toLowerCase().endsWith('.txt')
+        ) {
+            throw new Error('Invalid note filename')
+        }
+
+        const notesPath = path.join(C.rootDir, 'notes')
+        const content = await readFile(path.join(notesPath, filename), 'utf-8')
+        return { filename, content }
+    },
     hideWindow: () => {
         mainWindow?.hide()
     }
@@ -154,6 +166,7 @@ app.whenReady().then(() => {
         apiFuncs.send(message, currentFilename)
     )
     ipcMain.handle('listNotes', () => apiFuncs.listNotes())
+    ipcMain.handle('openNote', (e, filename: string) => apiFuncs.openNote(filename))
     ipcMain.handle('hideWindow', (e) => apiFuncs.hideWindow())
 
 

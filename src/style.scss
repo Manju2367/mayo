@@ -250,7 +250,22 @@ kbd {
 .note-table td { padding: 13px 14px; border-top: 1px solid #f0f1f4; font-size: 12px; }
 .note-table tbody tr { transition: background 120ms ease; }
 .note-table tbody tr:hover { background: #fafaff; }
+.note-table tbody tr.is-selected { background: #f3f2ff; }
 .note-name-cell { overflow: hidden; color: #303440; text-overflow: ellipsis; white-space: nowrap; }
+.note-open-button {
+    max-width: 100%;
+    overflow: hidden;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    text-align: left;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.note-open-button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+.note-open-button:disabled { cursor: wait; }
 .note-date-cell { color: var(--muted); font-family: 'Segoe UI', 'Yu Gothic UI', sans-serif; font-size: 11px !important; white-space: nowrap; }
 .note-list-message { margin: 0; padding: 24px 14px; color: var(--muted); font-size: 12px; text-align: center; }
 .note-list-message.is-error { color: #bd5a5a; }
