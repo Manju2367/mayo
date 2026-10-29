@@ -271,6 +271,68 @@ kbd {
 .note-list-message.is-error { color: #bd5a5a; }
 .note-list-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 15px; color: var(--muted); font-size: 10px; }
 .note-list-footer kbd { margin-right: 4px; }
+.dialog-backdrop {
+    position: fixed;
+    z-index: 10;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background: rgba(20, 23, 34, 0.34);
+    backdrop-filter: blur(5px);
+    -webkit-app-region: no-drag;
+}
+.confirm-dialog {
+    width: min(100%, 420px);
+    padding: 30px;
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: 0 24px 70px rgba(10, 13, 25, 0.28), 0 3px 12px rgba(10, 13, 25, 0.1);
+    text-align: center;
+    -webkit-app-region: no-drag;
+}
+.dialog-icon {
+    display: grid;
+    width: 42px;
+    height: 42px;
+    place-items: center;
+    margin: 0 auto 14px;
+    border: 1px solid #f3dfc7;
+    border-radius: 14px;
+    background: #fff8ef;
+    color: #c17c32;
+    font-family: Georgia, serif;
+    font-size: 23px;
+    font-weight: 700;
+}
+.dialog-eyebrow {
+    margin: 0 0 7px;
+    color: #a0a4ae;
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+}
+.confirm-dialog h2 { margin: 0; color: #252833; font-size: 17px; font-weight: 600; }
+.dialog-description { margin: 12px 0 24px; color: #777d89; font-size: 12px; line-height: 1.9; overflow-wrap: anywhere; }
+.dialog-actions { display: flex; justify-content: center; gap: 10px; }
+.dialog-actions button {
+    min-height: 40px;
+    padding: 0 14px;
+    border: 1px solid transparent;
+    border-radius: 9px;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 600;
+    transition: background 150ms ease, border-color 150ms ease, transform 150ms ease;
+}
+.dialog-actions button:hover { transform: translateY(-1px); }
+.dialog-cancel-button { border-color: #e7e8ee !important; background: #fff; color: #626875; }
+.dialog-cancel-button:hover { border-color: #d9d6fa !important; background: #f8f7ff; }
+.dialog-confirm-button { background: var(--accent); box-shadow: 0 3px 7px rgba(112, 101, 232, 0.18); color: #fff; }
+.dialog-confirm-button:hover { background: #6257d8; }
+.dialog-actions button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 
 @media (max-width: 560px) {
@@ -285,6 +347,8 @@ kbd {
     .note-table th:last-child { width: 45%; }
     .note-date-cell { font-size: 10px !important; }
     .back-button { padding: 0 8px; font-size: 10px; }
+    .confirm-dialog { padding: 25px 20px; }
+    .dialog-actions { flex-direction: column-reverse; }
     .page-shortcut-hint { display: none; }
     .shortcut-label { display: none; }
     .save-button { gap: 6px; padding: 0 10px; }

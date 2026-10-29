@@ -4,6 +4,7 @@ import MemoEditor from './components/MemoEditor.vue'
 import MemoFooter from './components/MemoFooter.vue'
 import MemoHeader from './components/MemoHeader.vue'
 import NoteListPage from './components/NoteListPage.vue'
+import ConfirmDiscardDialog from './components/ConfirmDiscardDialog.vue'
 import type { NoteDocument } from '../electron/shared/electron-api'
 
 const currentPage = ref<'memo' | 'list'>('memo')
@@ -15,6 +16,7 @@ const lastSavedContent = ref<string | null>(null)
 const isSaving = ref(false)
 const saveStatus = ref('すぐに書き始められます')
 const saveSucceeded = ref(false)
+const pendingNote = ref<NoteDocument | null>(null)
 
 const characterCount = computed(() => `${memo.value.length.toLocaleString('ja-JP')} 文字`)
 const isDirty = computed(() =>
@@ -67,13 +69,8 @@ const returnToMemo = async () => {
     memoEditor.value?.focus()
 }
 
-const openNote = async (note: NoteDocument) => {
-    if (isDirty.value && !window.confirm('編集中のメモは保存されていません。破棄して別のメモを開きますか？')) {
-        await nextTick()
-        noteListPage.value?.focus()
-        return
-    }
-
+const applyOpenNote = async (note: NoteDocument) => {
+    pendingNote.value = null
     memo.value = note.content
     currentFilename.value = note.filename
     lastSavedContent.value = note.content
@@ -82,8 +79,37 @@ const openNote = async (note: NoteDocument) => {
     await returnToMemo()
 }
 
+const openNote = async (note: NoteDocument) => {
+    if (isDirty.value) {
+        pendingNote.value = note
+        await nextTick()
+        return
+    }
+
+    await applyOpenNote(note)
+}
+
+const cancelOpenNote = async () => {
+    pendingNote.value = null
+    await nextTick()
+    noteListPage.value?.focus()
+}
+
+const confirmOpenNote = async () => {
+    const note = pendingNote.value
+    if (note) await applyOpenNote(note)
+}
+
 const handleWindowKeydown = (event: KeyboardEvent) => {
     if (event.isComposing) return
+
+    if (pendingNote.value) {
+        if (event.key === 'Escape') {
+            event.preventDefault()
+            void cancelOpenNote()
+        }
+        return
+    }
 
     const key = event.key.toLowerCase()
     const hasModifier = event.ctrlKey || event.metaKey
@@ -153,6 +179,12 @@ onUnmounted(() => {
             ref="noteListPage"
             @back="returnToMemo"
             @open="openNote"
+        />
+        <ConfirmDiscardDialog
+            v-if="pendingNote"
+            :filename="pendingNote.filename"
+            @cancel="cancelOpenNote"
+            @confirm="confirmOpenNote"
         />
         <p class="backdrop-tip">
             <kbd>Esc</kbd>
