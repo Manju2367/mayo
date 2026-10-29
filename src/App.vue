@@ -7,8 +7,27 @@ import NoteListPage from './components/NoteListPage.vue'
 import ConfirmDiscardDialog from './components/ConfirmDiscardDialog.vue'
 import type { NoteDocument } from '../electron/shared/electron-api'
 
+const placeholderOptions = [
+    'メモを書き留める',
+    'ささっとメモる',
+    '何を書こうか？',
+    '何か書いてみよう',
+    'メモメモ…',
+    'マヨってる？',
+    'アイデアを書き残す',
+    '忘れないようにメモしよう',
+    '何を書こうとしてたんだっけ…？',
+    '未来の自分へ'
+]
+
+const choosePlaceholder = (): string => {
+    const index = Math.floor(Math.random() * placeholderOptions.length)
+    return placeholderOptions[index] ?? 'メモを書き留める'
+}
+
 const currentPage = ref<'memo' | 'list'>('memo')
 const memo = ref('')
+const placeholder = ref(choosePlaceholder())
 const memoEditor = ref<{ focus: () => void } | null>(null)
 const noteListPage = ref<{ focus: () => void } | null>(null)
 const currentFilename = ref<string | null>(null)
@@ -92,6 +111,7 @@ const openNote = async (note: NoteDocument) => {
 const applyNewMemo = async () => {
     pendingAction.value = null
     memo.value = ''
+    placeholder.value = choosePlaceholder()
     currentFilename.value = null
     lastSavedContent.value = null
     saveSucceeded.value = false
@@ -192,6 +212,7 @@ onUnmounted(() => {
             <MemoEditor
                 ref="memoEditor"
                 v-model="memo"
+                :placeholder="placeholder"
                 @input="handleInput"
                 @save="saveMemo"
             />

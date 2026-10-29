@@ -3,6 +3,7 @@ import { ref } from 'vue'
 
 defineProps<{
     modelValue: string
+    placeholder: string
 }>()
 
 const emit = defineEmits<{
@@ -48,7 +49,7 @@ defineExpose({ focus })
         ref="textarea"
         :value="modelValue"
         name="memo"
-        placeholder="思いついたことを書き留める…"
+        :placeholder="placeholder"
         spellcheck="false"
         autofocus
         @input="handleInput"
