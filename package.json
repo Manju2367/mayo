@@ -48,6 +48,7 @@
   },
   "dependencies": {
     "electron-log": "^5.4.4",
+    "electron-updater": "^6.8.11",
     "vue": "^3.5.44"
   }
 }
