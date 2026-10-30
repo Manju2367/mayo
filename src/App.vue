@@ -258,7 +258,6 @@ onUnmounted(() => {
     <main
         id="main-container"
         :aria-label="currentPage === 'memo' ? 'クイックメモ' : '保存したメモ'"
-        @click.self="hideWindow"
     >
         <section v-if="currentPage === 'memo'" class="memo-card" aria-labelledby="memo-title">
             <MemoHeader
