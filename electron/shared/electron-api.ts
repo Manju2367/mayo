@@ -14,6 +14,7 @@ export default interface ElectronAPI {
     send(note: string, currentFilename: string | null): Promise<string>,
     listNotes(): Promise<NoteSummary[]>,
     openNote(filename: string): Promise<NoteDocument>,
+    deleteNote(filename: string): Promise<void>,
     hideWindow(): void,
 
     // events

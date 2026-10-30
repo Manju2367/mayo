@@ -2,10 +2,12 @@
 import { nextTick, onMounted, ref } from 'vue'
 import type { NoteDocument, NoteSummary } from '../../electron/shared/electron-api'
 import PageHeading from './PageHeading.vue'
+import ConfirmDeleteDialog from './ConfirmDeleteDialog.vue'
 
 const emit = defineEmits<{
     back: []
     open: [note: NoteDocument]
+    deleted: [filename: string]
 }>()
 
 const panel = ref<HTMLElement | null>(null)
@@ -15,6 +17,9 @@ const errorMessage = ref('')
 const selectedIndex = ref(-1)
 const isOpening = ref(false)
 const openingError = ref('')
+const deleteError = ref('')
+const pendingDelete = ref<NoteSummary | null>(null)
+const isDeleting = ref(false)
 
 const formatUpdatedAt = (timestamp: number) =>
     new Intl.DateTimeFormat('ja-JP', {
@@ -78,7 +83,76 @@ const selectNote = async (index: number, shouldFocus = false) => {
     }
 }
 
+const requestDelete = (note: NoteSummary) => {
+    if (!isDeleting.value) pendingDelete.value = note
+}
+
+const cancelDelete = async () => {
+    pendingDelete.value = null
+    await nextTick()
+    panel.value?.querySelector<HTMLButtonElement>(`.note-open-button[data-note-index="${selectedIndex.value}"]`)?.focus()
+}
+
+const confirmDelete = () => {
+    const note = pendingDelete.value
+    if (note) void deleteNote(note)
+}
+
+const deleteNote = async (note: NoteSummary) => {
+    if (isDeleting.value) return
+
+    isDeleting.value = true
+    deleteError.value = ''
+    const deletedIndex = notes.value.findIndex((item) => item.filename === note.filename)
+    try {
+        await window.electronAPI.deleteNote(note.filename)
+        emit('deleted', note.filename)
+        notes.value = notes.value.filter((item) => item.filename !== note.filename)
+        if (notes.value.length === 0) {
+            selectedIndex.value = -1
+        } else {
+            selectedIndex.value = Math.min(Math.max(deletedIndex, 0), notes.value.length - 1)
+            await selectNote(selectedIndex.value, true)
+        }
+    } catch {
+        deleteError.value = 'メモを削除できませんでした'
+    } finally {
+        pendingDelete.value = null
+        isDeleting.value = false
+        await nextTick()
+        const button = panel.value?.querySelector<HTMLButtonElement>(`.note-open-button[data-note-index="${selectedIndex.value}"]`)
+        if (button) button.focus({ preventScroll: true })
+        else panel.value?.focus()
+    }
+}
+
 const handleListKeydown = (event: KeyboardEvent) => {
+    if (pendingDelete.value) return
+
+    const target = event.target
+    const noteIndex = target instanceof HTMLButtonElement
+        ? Number(target.dataset.noteIndex)
+        : -1
+    const focusedNote = noteIndex === selectedIndex.value ? notes.value[noteIndex] : undefined
+    const key = event.key.toLowerCase()
+    const forceDelete = (event.ctrlKey || event.metaKey) && event.shiftKey && key === 'd'
+
+    if (focusedNote && forceDelete) {
+        event.preventDefault()
+        void deleteNote(focusedNote)
+        return
+    }
+
+    if (
+        focusedNote &&
+        !event.ctrlKey && !event.metaKey && !event.altKey &&
+        (key === 'd' || key === 'delete')
+    ) {
+        event.preventDefault()
+        requestDelete(focusedNote)
+        return
+    }
+
     if (event.key === 'ArrowDown') {
         event.preventDefault()
         void selectNote(selectedIndex.value < 0 ? 0 : selectedIndex.value + 1, true)
@@ -115,6 +189,7 @@ onMounted(() => {
                     <tr>
                         <th scope="col">ファイル名</th>
                         <th scope="col">更新日時</th>
+                        <th scope="col"><span class="sr-only">操作</span></th>
                     </tr>
                 </thead>
                 <tbody v-if="notes.length > 0">
@@ -141,6 +216,19 @@ onMounted(() => {
                                 {{ formatUpdatedAt(note.updatedAt) }}
                             </time>
                         </td>
+                        <td class="note-action-cell">
+                            <button
+                                class="note-delete-button"
+                                type="button"
+                                :data-note-index="index"
+                                :aria-label="`${note.filename}を削除`"
+                                :disabled="isDeleting"
+                                @focus="selectedIndex = index"
+                                @click.stop="selectedIndex = index; requestDelete(note)"
+                            >
+                                <img src="../assets/images/trash.svg" alt="">
+                            </button>
+                        </td>
                     </tr>
                 </tbody>
             </table>
@@ -150,6 +238,7 @@ onMounted(() => {
             <p v-else-if="notes.length === 0" class="note-list-message">保存されたメモはありません</p>
             <p v-if="openingError" class="note-list-message is-error" role="alert">{{ openingError }}</p>
             <p v-else-if="isOpening" class="note-list-message" role="status">メモを開いています…</p>
+            <p v-if="deleteError" class="note-list-message is-error" role="alert">{{ deleteError }}</p>
         </div>
 
         <footer class="memo-footer note-list-footer">
@@ -164,8 +253,18 @@ onMounted(() => {
                     <span class="shortcut"><kbd>Enter</kbd><span class="shortcut-label">開く</span></span>
                     <span class="shortcut-divider" aria-hidden="true"></span>
                     <span class="shortcut"><kbd>Ctrl</kbd><span>+</span><kbd>N</kbd><span class="shortcut-label">新規</span></span>
+                    <span class="shortcut-divider" aria-hidden="true"></span>
+                    <span class="shortcut"><kbd>D</kbd><span>/</span><kbd>Del</kbd><span class="shortcut-label">削除</span></span>
+                    <span class="shortcut-divider" aria-hidden="true"></span>
+                    <span class="shortcut"><kbd>Ctrl</kbd><span>+</span><kbd>Shift</kbd><span>+</span><kbd>D</kbd><span class="shortcut-label">即削除</span></span>
                 </div>
             </div>
         </footer>
+        <ConfirmDeleteDialog
+            v-if="pendingDelete"
+            :filename="pendingDelete.filename"
+            @cancel="cancelDelete"
+            @confirm="confirmDelete"
+        />
     </section>
 </template>

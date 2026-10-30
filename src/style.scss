@@ -268,13 +268,33 @@ kbd {
     font-size: 10px;
     font-weight: 500;
 }
-.note-table th:first-child { width: 62%; }
-.note-table th:last-child { width: 38%; }
+.note-table th:first-child { width: 58%; }
+.note-table th:last-child { width: 44px; padding-right: 5px; padding-left: 5px; }
 .note-table td { padding: 13px 14px; border-top: 1px solid #f0f1f4; font-size: 12px; }
 .note-table tbody tr { transition: background 120ms ease; }
 .note-table tbody tr:hover { background: #fffaf0; }
 .note-table tbody tr.is-selected { background: #fff6d8; }
 .note-name-cell { overflow: hidden; color: #39352f; text-overflow: ellipsis; white-space: nowrap; }
+.note-action-cell { width: 44px; padding-right: 5px !important; padding-left: 5px !important; text-align: center; }
+.note-delete-button {
+    display: inline-grid;
+    width: 30px;
+    height: 30px;
+    place-items: center;
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: none;
+    transition: background 120ms ease, opacity 120ms ease;
+}
+.note-table tbody tr:hover .note-delete-button,
+.note-table tbody tr:focus-within .note-delete-button { opacity: 1; pointer-events: auto; }
+.note-delete-button:hover { background: #fee9e4; }
+.note-delete-button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.note-delete-button img { width: 17px; height: 17px; }
 .note-open-button {
     max-width: 100%;
     overflow: hidden;
@@ -327,6 +347,8 @@ kbd {
     font-size: 23px;
     font-weight: 700;
 }
+.dialog-icon.is-danger { border-color: #f1d2cb; background: #fff0eb; }
+.dialog-icon.is-danger img { width: 19px; height: 19px; }
 .dialog-eyebrow {
     margin: 0 0 7px;
     color: #a0a4ae;
@@ -364,8 +386,9 @@ kbd {
     .footer-actions { align-items: flex-end; }
     .shortcut-hint { gap: 8px; }
     .note-table th, .note-table td { padding-right: 8px; padding-left: 8px; }
-    .note-table th:first-child { width: 55%; }
-    .note-table th:last-child { width: 45%; }
+    .note-table th:first-child { width: 48%; }
+    .note-table th:last-child { width: 40px; padding-right: 5px; padding-left: 5px; }
+    .note-action-cell { width: 40px; }
     .note-date-cell { font-size: 10px !important; }
     .back-button { padding: 0 8px; font-size: 10px; }
     .confirm-dialog { padding: 25px 20px; }

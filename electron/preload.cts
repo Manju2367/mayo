@@ -8,6 +8,7 @@ const api: ElectronAPI = {
     send: (note, currentFilename) => ipcRenderer.invoke('send', note, currentFilename),
     listNotes: () => ipcRenderer.invoke('listNotes'),
     openNote: (filename) => ipcRenderer.invoke('openNote', filename),
+    deleteNote: (filename) => ipcRenderer.invoke('deleteNote', filename),
     hideWindow: () => ipcRenderer.invoke('hideWindow'),
 
     onShow: (callback) => ipcRenderer.on('show', (_event: any) => callback())

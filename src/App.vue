@@ -108,6 +108,16 @@ const openNote = async (note: NoteDocument) => {
     await applyOpenNote(note)
 }
 
+const handleNoteDeleted = (filename: string) => {
+    if (currentFilename.value !== filename) return
+    currentFilename.value = null
+    lastSavedContent.value = null
+    saveSucceeded.value = false
+    saveStatus.value = memo.value.length > 0
+        ? '削除したメモの内容は未保存です'
+        : 'すぐに書き始められます'
+}
+
 const applyNewMemo = async () => {
     pendingAction.value = null
     memo.value = ''
@@ -229,6 +239,7 @@ onUnmounted(() => {
             ref="noteListPage"
             @back="returnToMemo"
             @open="openNote"
+            @deleted="handleNoteDeleted"
         />
         <ConfirmDiscardDialog
             v-if="pendingAction"
