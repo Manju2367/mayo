@@ -2,7 +2,7 @@
 import { onMounted, ref } from 'vue'
 import type { UpdateStatus } from '../../electron/shared/electron-api'
 
-defineProps<{ status: Exclude<UpdateStatus, { status: 'error' }> }>()
+defineProps<{ status: UpdateStatus }>()
 const emit = defineEmits<{ later: []; restart: [] }>()
 const laterButton = ref<HTMLButtonElement | null>(null)
 
@@ -42,19 +42,30 @@ onMounted(() => laterButton.value?.focus())
             <div class="dialog-icon update-dialog-icon" aria-hidden="true">↻</div>
             <p class="dialog-eyebrow">MAYO UPDATE</p>
             <h2 id="update-dialog-title">
-                {{ status.status === 'downloaded' ? 'アップデートの準備ができました' : '新しいバージョンがあります' }}
+                {{ status.status === 'error'
+                    ? 'アップデートできませんでした'
+                    : status.status === 'downloaded'
+                        ? 'アップデートの準備ができました'
+                        : '新しいバージョンがあります' }}
             </h2>
             <p id="update-dialog-description" class="dialog-description">
-                バージョン {{ status.version }}
-                <template v-if="status.status === 'available'">をダウンロードしています…</template>
-                <template v-else-if="status.status === 'downloading'">をダウンロードしています（{{ Math.floor(status.percent) }}%）</template>
-                <template v-else>を適用するには、Mayoを再起動してください。</template>
+                <template v-if="status.status === 'error'">
+                    更新の取得に失敗しました。次回起動時にもう一度確認します。
+                </template>
+                <template v-else>
+                    バージョン {{ status.version }}
+                    <template v-if="status.status === 'available'">をダウンロードしています…</template>
+                    <template v-else-if="status.status === 'downloading'">をダウンロードしています（{{ Math.floor(status.percent) }}%）</template>
+                    <template v-else>を適用するには、Mayoを再起動してください。</template>
+                </template>
             </p>
             <div v-if="status.status === 'downloading'" class="update-progress" aria-hidden="true">
                 <span :style="{ width: `${Math.max(0, Math.min(status.percent, 100))}%` }"></span>
             </div>
             <div class="dialog-actions">
-                <button ref="laterButton" class="dialog-cancel-button" type="button" @click="emit('later')">後で</button>
+                <button ref="laterButton" class="dialog-cancel-button" type="button" @click="emit('later')">
+                    {{ status.status === 'error' ? '閉じる' : '後で' }}
+                </button>
                 <button
                     v-if="status.status === 'downloaded'"
                     class="dialog-confirm-button"

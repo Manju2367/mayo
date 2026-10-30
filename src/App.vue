@@ -40,7 +40,7 @@ const saveSucceeded = ref(false)
 const pendingAction = ref<{ type: 'open'; note: NoteDocument } | { type: 'new' } | null>(null)
 const isQuitDialogOpen = ref(false)
 const quitSaveError = ref('')
-const updateStatus = ref<Exclude<UpdateStatus, { status: 'error' }> | null>(null)
+const updateStatus = ref<UpdateStatus | null>(null)
 const isUpdateDialogOpen = ref(false)
 const hasDismissedUpdate = ref(false)
 
@@ -261,7 +261,10 @@ onMounted(() => {
     window.addEventListener('keydown', handleWindowKeydown)
     window.electronAPI.onQuitRequest(requestQuit)
     window.electronAPI.onUpdateStatus((status) => {
-        if (status.status === 'error') return
+        if (status.status === 'error') {
+            if (isUpdateDialogOpen.value) updateStatus.value = status
+            return
+        }
         updateStatus.value = status
         if (status.status === 'downloaded') {
             hasDismissedUpdate.value = false
