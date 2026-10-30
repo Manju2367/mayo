@@ -9,6 +9,10 @@ const api: ElectronAPI = {
     listNotes: () => ipcRenderer.invoke('listNotes'),
     openNote: (filename) => ipcRenderer.invoke('openNote', filename),
     deleteNote: (filename) => ipcRenderer.invoke('deleteNote', filename),
+    onQuitRequest: (callback) => ipcRenderer.on('app-quit-requested', () => callback()),
+    readyForQuitRequests: () => ipcRenderer.send('renderer-ready-for-quit'),
+    showQuitPrompt: () => ipcRenderer.send('show-quit-prompt'),
+    resolveQuit: (shouldQuit) => ipcRenderer.send('resolve-quit', shouldQuit),
     hideWindow: () => ipcRenderer.invoke('hideWindow'),
 
     onShow: (callback) => ipcRenderer.on('show', (_event: any) => callback())

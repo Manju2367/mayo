@@ -8,6 +8,15 @@ import { mkdir, readFile, readdir, rename, stat, unlink, writeFile } from 'node:
 
 
 let mainWindow: BrowserWindow | null = null
+let quitRequestPending = false
+let rendererReadyForQuit = false
+let isQuitAllowed = false
+
+const notifyRendererAboutQuit = () => {
+    if (!quitRequestPending || !rendererReadyForQuit || !mainWindow || mainWindow.isDestroyed()) return
+    mainWindow.webContents.send('app-quit-requested')
+}
+
 const createWindow = () => {
     mainWindow = new BrowserWindow({
         title: C.appName,
@@ -26,8 +35,21 @@ const createWindow = () => {
         }
     })
 
+    mainWindow.on('close', (event) => {
+        if (isQuitAllowed) return
+        event.preventDefault()
+        app.quit()
+    })
+
     mainWindow.on('blur', () => {
         mainWindow?.hide()
+    })
+
+    mainWindow.webContents.on('did-fail-load', (_event, _code, _description, _url, isMainFrame) => {
+        if (!isMainFrame || !quitRequestPending) return
+        quitRequestPending = false
+        isQuitAllowed = true
+        app.quit()
     })
 
     if (app.isPackaged) {
@@ -178,6 +200,24 @@ app.whenReady().then(() => {
     ipcMain.handle('openNote', (e, filename: string) => apiFuncs.openNote(filename))
     ipcMain.handle('deleteNote', (e, filename: string) => apiFuncs.deleteNote(filename))
     ipcMain.handle('hideWindow', (e) => apiFuncs.hideWindow())
+    ipcMain.on('renderer-ready-for-quit', (e) => {
+        if (e.sender !== mainWindow?.webContents) return
+        rendererReadyForQuit = true
+        notifyRendererAboutQuit()
+    })
+    ipcMain.on('show-quit-prompt', (e) => {
+        if (e.sender !== mainWindow?.webContents || !quitRequestPending || !mainWindow || mainWindow.isDestroyed()) return
+        mainWindow.show()
+        mainWindow.focus()
+    })
+    ipcMain.on('resolve-quit', (e, shouldQuit: boolean) => {
+        if (e.sender !== mainWindow?.webContents || !quitRequestPending) return
+        quitRequestPending = false
+        if (shouldQuit === true) {
+            isQuitAllowed = true
+            app.quit()
+        }
+    })
 
 
 
@@ -213,6 +253,19 @@ app.whenReady().then(() => {
 
 app.on('will-quit', () => {
     globalShortcut.unregisterAll()
+})
+
+app.on('before-quit', (event) => {
+    if (isQuitAllowed) return
+    if (!mainWindow || mainWindow.isDestroyed()) {
+        isQuitAllowed = true
+        return
+    }
+
+    event.preventDefault()
+    if (quitRequestPending) return
+    quitRequestPending = true
+    notifyRendererAboutQuit()
 })
 
 app.on('window-all-closed', () => {

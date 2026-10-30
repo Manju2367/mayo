@@ -5,6 +5,7 @@ import MemoFooter from './components/MemoFooter.vue'
 import MemoHeader from './components/MemoHeader.vue'
 import NoteListPage from './components/NoteListPage.vue'
 import ConfirmDiscardDialog from './components/ConfirmDiscardDialog.vue'
+import ConfirmQuitDialog from './components/ConfirmQuitDialog.vue'
 import type { NoteDocument } from '../electron/shared/electron-api'
 
 const placeholderOptions = [
@@ -36,14 +37,16 @@ const isSaving = ref(false)
 const saveStatus = ref('すぐに書き始められます')
 const saveSucceeded = ref(false)
 const pendingAction = ref<{ type: 'open'; note: NoteDocument } | { type: 'new' } | null>(null)
+const isQuitDialogOpen = ref(false)
+const quitSaveError = ref('')
 
 const characterCount = computed(() => `${memo.value.length.toLocaleString('ja-JP')} 文字`)
 const isDirty = computed(() =>
     lastSavedContent.value === null ? memo.value.length > 0 : memo.value !== lastSavedContent.value
 )
 
-const saveMemo = async () => {
-    if (isSaving.value) return
+const saveMemo = async (): Promise<boolean> => {
+    if (isSaving.value) return false
 
     isSaving.value = true
     const content = memo.value
@@ -55,11 +58,13 @@ const saveMemo = async () => {
         lastSavedContent.value = content
         saveSucceeded.value = memo.value === content
         saveStatus.value = saveSucceeded.value ? '保存しました' : ''
+        return saveSucceeded.value
     } catch (error) {
         const message = error instanceof Error ? error.message : String(error)
         saveStatus.value = message.includes('既に存在します')
             ? '同名のファイルがあります'
             : '保存できませんでした'
+        return false
     } finally {
         isSaving.value = false
     }
@@ -153,8 +158,48 @@ const confirmPendingAction = async () => {
     else await applyNewMemo()
 }
 
+const requestQuit = async () => {
+    if (!isDirty.value) {
+        window.electronAPI.resolveQuit(true)
+        return
+    }
+
+    pendingAction.value = null
+    quitSaveError.value = ''
+    isQuitDialogOpen.value = true
+    await nextTick()
+    window.electronAPI.showQuitPrompt()
+}
+
+const cancelQuit = async () => {
+    isQuitDialogOpen.value = false
+    quitSaveError.value = ''
+    window.electronAPI.resolveQuit(false)
+    await nextTick()
+    if (currentPage.value === 'list') noteListPage.value?.focus()
+    else memoEditor.value?.focus()
+}
+
+const discardAndQuit = () => {
+    isQuitDialogOpen.value = false
+    window.electronAPI.resolveQuit(true)
+}
+
+const saveAndQuit = async () => {
+    if (isSaving.value) return
+    quitSaveError.value = ''
+    if (await saveMemo()) {
+        isQuitDialogOpen.value = false
+        window.electronAPI.resolveQuit(true)
+    } else {
+        quitSaveError.value = '保存できませんでした。内容を確認して、もう一度お試しください。'
+    }
+}
+
 const handleWindowKeydown = (event: KeyboardEvent) => {
     if (event.isComposing) return
+
+    if (isQuitDialogOpen.value) return
 
     if (pendingAction.value) {
         if (event.key === 'Escape') {
@@ -195,6 +240,8 @@ const handleWindowKeydown = (event: KeyboardEvent) => {
 
 onMounted(() => {
     window.addEventListener('keydown', handleWindowKeydown)
+    window.electronAPI.onQuitRequest(requestQuit)
+    window.electronAPI.readyForQuitRequests()
     window.electronAPI.onShow(() => {
         if (currentPage.value === 'list') noteListPage.value?.focus()
         else memoEditor.value?.focus()
@@ -247,6 +294,14 @@ onUnmounted(() => {
             :filename="pendingAction.type === 'open' ? pendingAction.note.filename : undefined"
             @cancel="cancelPendingAction"
             @confirm="confirmPendingAction"
+        />
+        <ConfirmQuitDialog
+            v-if="isQuitDialogOpen"
+            :is-saving="isSaving"
+            :save-error="quitSaveError"
+            @save="saveAndQuit"
+            @discard="discardAndQuit"
+            @cancel="cancelQuit"
         />
         <p class="backdrop-tip">
             <kbd>Esc</kbd>

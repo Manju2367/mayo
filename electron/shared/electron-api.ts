@@ -15,6 +15,10 @@ export default interface ElectronAPI {
     listNotes(): Promise<NoteSummary[]>,
     openNote(filename: string): Promise<NoteDocument>,
     deleteNote(filename: string): Promise<void>,
+    onQuitRequest(callback: () => void): void,
+    readyForQuitRequests(): void,
+    showQuitPrompt(): void,
+    resolveQuit(shouldQuit: boolean): void,
     hideWindow(): void,
 
     // events
