@@ -6,7 +6,8 @@ import MemoHeader from './components/MemoHeader.vue'
 import NoteListPage from './components/NoteListPage.vue'
 import ConfirmDiscardDialog from './components/ConfirmDiscardDialog.vue'
 import ConfirmQuitDialog from './components/ConfirmQuitDialog.vue'
-import type { NoteDocument } from '../electron/shared/electron-api'
+import UpdateDialog from './components/UpdateDialog.vue'
+import type { NoteDocument, UpdateStatus } from '../electron/shared/electron-api'
 
 const placeholderOptions = [
     'メモを書き留める',
@@ -39,6 +40,9 @@ const saveSucceeded = ref(false)
 const pendingAction = ref<{ type: 'open'; note: NoteDocument } | { type: 'new' } | null>(null)
 const isQuitDialogOpen = ref(false)
 const quitSaveError = ref('')
+const updateStatus = ref<Exclude<UpdateStatus, { status: 'error' }> | null>(null)
+const isUpdateDialogOpen = ref(false)
+const hasDismissedUpdate = ref(false)
 
 const characterCount = computed(() => `${memo.value.length.toLocaleString('ja-JP')} 文字`)
 const isDirty = computed(() =>
@@ -176,6 +180,10 @@ const cancelQuit = async () => {
     quitSaveError.value = ''
     window.electronAPI.resolveQuit(false)
     await nextTick()
+    if (updateStatus.value?.status === 'downloaded') {
+        hasDismissedUpdate.value = false
+        isUpdateDialogOpen.value = true
+    }
     if (currentPage.value === 'list') noteListPage.value?.focus()
     else memoEditor.value?.focus()
 }
@@ -196,10 +204,21 @@ const saveAndQuit = async () => {
     }
 }
 
+const dismissUpdateDialog = () => {
+    hasDismissedUpdate.value = true
+    isUpdateDialogOpen.value = false
+}
+
+const restartToInstallUpdate = () => {
+    isUpdateDialogOpen.value = false
+    window.electronAPI.requestUpdateInstall()
+}
+
 const handleWindowKeydown = (event: KeyboardEvent) => {
     if (event.isComposing) return
 
     if (isQuitDialogOpen.value) return
+    if (isUpdateDialogOpen.value) return
 
     if (pendingAction.value) {
         if (event.key === 'Escape') {
@@ -241,6 +260,16 @@ const handleWindowKeydown = (event: KeyboardEvent) => {
 onMounted(() => {
     window.addEventListener('keydown', handleWindowKeydown)
     window.electronAPI.onQuitRequest(requestQuit)
+    window.electronAPI.onUpdateStatus((status) => {
+        if (status.status === 'error') return
+        updateStatus.value = status
+        if (status.status === 'downloaded') {
+            hasDismissedUpdate.value = false
+            isUpdateDialogOpen.value = true
+        } else if (!hasDismissedUpdate.value) {
+            isUpdateDialogOpen.value = true
+        }
+    })
     window.electronAPI.readyForQuitRequests()
     window.electronAPI.onShow(() => {
         if (currentPage.value === 'list') noteListPage.value?.focus()
@@ -301,6 +330,12 @@ onUnmounted(() => {
             @save="saveAndQuit"
             @discard="discardAndQuit"
             @cancel="cancelQuit"
+        />
+        <UpdateDialog
+            v-if="isUpdateDialogOpen && updateStatus"
+            :status="updateStatus"
+            @later="dismissUpdateDialog"
+            @restart="restartToInstallUpdate"
         />
         <p class="backdrop-tip">
             <kbd>Esc</kbd>

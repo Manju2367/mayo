@@ -8,6 +8,12 @@ export interface NoteDocument {
     content: string
 }
 
+export type UpdateStatus =
+    | { status: 'available'; version: string }
+    | { status: 'downloading'; version: string; percent: number }
+    | { status: 'downloaded'; version: string }
+    | { status: 'error'; message: string }
+
 export default interface ElectronAPI {
     // funcs
     log(...args: Array<any>): void,
@@ -19,6 +25,8 @@ export default interface ElectronAPI {
     readyForQuitRequests(): void,
     showQuitPrompt(): void,
     resolveQuit(shouldQuit: boolean): void,
+    requestUpdateInstall(): void,
+    onUpdateStatus(callback: (status: UpdateStatus) => void): void,
     hideWindow(): void,
 
     // events

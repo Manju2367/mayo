@@ -4,6 +4,10 @@ import * as C from './constsns.js'
 import type ElectronAPI from './shared/electron-api.js'
 import { existsSync } from 'node:fs'
 import { mkdir, readFile, readdir, rename, stat, unlink, writeFile } from 'node:fs/promises'
+import electronUpdater from 'electron-updater'
+import type { UpdateStatus } from './shared/electron-api.js'
+
+const { autoUpdater } = electronUpdater
 
 
 
@@ -11,6 +15,39 @@ let mainWindow: BrowserWindow | null = null
 let quitRequestPending = false
 let rendererReadyForQuit = false
 let isQuitAllowed = false
+let installUpdateAfterQuit = false
+let availableUpdateVersion: string | null = null
+let updateDownloaded = false
+
+autoUpdater.autoDownload = true
+autoUpdater.autoInstallOnAppQuit = false
+
+const sendUpdateStatus = (status: UpdateStatus) => {
+    if (!mainWindow || mainWindow.isDestroyed()) return
+    mainWindow.webContents.send('update-status', status)
+}
+
+autoUpdater.on('update-available', (info) => {
+    availableUpdateVersion = info.version
+    updateDownloaded = false
+    sendUpdateStatus({ status: 'available', version: info.version })
+})
+autoUpdater.on('download-progress', (progress) => {
+    sendUpdateStatus({
+        status: 'downloading',
+        version: availableUpdateVersion ?? app.getVersion(),
+        percent: progress.percent
+    })
+})
+autoUpdater.on('update-downloaded', (info) => {
+    availableUpdateVersion = info.version
+    updateDownloaded = true
+    sendUpdateStatus({ status: 'downloaded', version: info.version })
+})
+autoUpdater.on('error', (error) => {
+    console.error('アプリの更新に失敗しました。', error)
+    sendUpdateStatus({ status: 'error', message: error.message })
+})
 
 const notifyRendererAboutQuit = () => {
     if (!quitRequestPending || !rendererReadyForQuit || !mainWindow || mainWindow.isDestroyed()) return
@@ -50,6 +87,12 @@ const createWindow = () => {
         quitRequestPending = false
         isQuitAllowed = true
         app.quit()
+    })
+
+    mainWindow.webContents.on('did-finish-load', () => {
+        if (app.isPackaged) void autoUpdater.checkForUpdates().catch((error: unknown) => {
+            console.error('更新の確認に失敗しました。', error)
+        })
     })
 
     if (app.isPackaged) {
@@ -213,10 +256,22 @@ app.whenReady().then(() => {
     ipcMain.on('resolve-quit', (e, shouldQuit: boolean) => {
         if (e.sender !== mainWindow?.webContents || !quitRequestPending) return
         quitRequestPending = false
+        if (shouldQuit !== true) installUpdateAfterQuit = false
         if (shouldQuit === true) {
             isQuitAllowed = true
-            app.quit()
+            if (installUpdateAfterQuit) {
+                installUpdateAfterQuit = false
+                autoUpdater.quitAndInstall()
+            } else {
+                app.quit()
+            }
         }
+    })
+    ipcMain.on('request-update-install', (e) => {
+        if (e.sender !== mainWindow?.webContents || quitRequestPending || !updateDownloaded) return
+        installUpdateAfterQuit = true
+        quitRequestPending = true
+        notifyRendererAboutQuit()
     })
 
 

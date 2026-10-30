@@ -380,6 +380,9 @@ kbd {
 .dialog-confirm-button:hover { background: var(--accent-hover); }
 .quit-dialog-actions { gap: 8px; }
 .quit-dialog-actions button { padding-right: 12px; padding-left: 12px; }
+.update-dialog-icon { border-color: #e7e2c7; background: #fefadd; color: #8b672e; }
+.update-progress { height: 6px; margin: -10px 0 22px; overflow: hidden; border-radius: 999px; background: #eeeadd; }
+.update-progress span { display: block; height: 100%; border-radius: inherit; background: var(--accent); transition: width 180ms ease; }
 .dialog-save-button { background: var(--accent); box-shadow: 0 3px 7px rgba(217, 52, 61, 0.2); color: #fff; }
 .dialog-save-button:hover { background: var(--accent-hover); }
 .dialog-save-button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
