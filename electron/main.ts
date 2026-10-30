@@ -66,6 +66,8 @@ const createWindow = () => {
         alwaysOnTop: true,
         skipTaskbar: true,
         show: false,
+        resizable: false,
+        minimizable: false,
         webPreferences: {
             contextIsolation: true,
             preload: path.join(C.__dirname, 'preload.cjs')
