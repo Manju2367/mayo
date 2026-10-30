@@ -7,4 +7,5 @@ import { app } from 'electron'
 export const __filename = fileURLToPath(import.meta.url)
 export const __dirname = path.dirname(__filename)
 export const appName = 'Mayo'
-export const rootDir = app.isPackaged ? path.dirname(app.getPath('exe')) : path.join(__dirname, '..')
+// Keep packaged user data outside the installation directory so updates don't replace notes.
+export const rootDir = app.isPackaged ? app.getPath('userData') : path.join(__dirname, '..')
