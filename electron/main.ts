@@ -181,6 +181,7 @@ app.whenReady().then(() => {
     })
 
     const tray = new Tray(path.join(C.__dirname, '../public/icon-512.png'))
+    tray.setToolTip('Mayo')
     tray.setContextMenu(Menu.buildFromTemplate([
         {
             label: '終了',
