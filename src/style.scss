@@ -50,6 +50,17 @@ button { -webkit-app-region: no-drag; }
     padding: 36px;
     background: rgba(21, 25, 36, 0.48);
     -webkit-app-region: no-drag;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+textarea {
+    -webkit-user-select: text;
+    user-select: text;
+}
+
+img {
+    -webkit-user-drag: none;
 }
 
 .memo-card {
