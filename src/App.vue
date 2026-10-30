@@ -110,12 +110,12 @@ const openNote = async (note: NoteDocument) => {
 
 const handleNoteDeleted = (filename: string) => {
     if (currentFilename.value !== filename) return
+    memo.value = ''
     currentFilename.value = null
     lastSavedContent.value = null
+    placeholder.value = choosePlaceholder()
     saveSucceeded.value = false
-    saveStatus.value = memo.value.length > 0
-        ? '削除したメモの内容は未保存です'
-        : 'すぐに書き始められます'
+    saveStatus.value = 'すぐに書き始められます'
 }
 
 const applyNewMemo = async () => {
