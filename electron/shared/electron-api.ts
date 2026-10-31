@@ -27,6 +27,7 @@ export default interface ElectronAPI {
     resolveQuit(shouldQuit: boolean): void,
     requestUpdateInstall(): void,
     onUpdateStatus(callback: (status: UpdateStatus) => void): void,
+    isUpdatePreviewEnabled(): Promise<boolean>,
     hideWindow(): void,
 
     // events

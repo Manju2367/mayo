@@ -6,7 +6,6 @@ import MemoHeader from './components/MemoHeader.vue'
 import NoteListPage from './components/NoteListPage.vue'
 import ConfirmDiscardDialog from './components/ConfirmDiscardDialog.vue'
 import ConfirmQuitDialog from './components/ConfirmQuitDialog.vue'
-import UpdateDialog from './components/UpdateDialog.vue'
 import type { NoteDocument, UpdateStatus } from '../electron/shared/electron-api'
 
 const placeholderOptions = [
@@ -41,8 +40,7 @@ const pendingAction = ref<{ type: 'open'; note: NoteDocument } | { type: 'new' }
 const isQuitDialogOpen = ref(false)
 const quitSaveError = ref('')
 const updateStatus = ref<UpdateStatus | null>(null)
-const isUpdateDialogOpen = ref(false)
-const hasDismissedUpdate = ref(false)
+const updatePreviewEnabled = ref(false)
 
 const characterCount = computed(() => `${memo.value.length.toLocaleString('ja-JP')} 文字`)
 const isDirty = computed(() =>
@@ -180,10 +178,6 @@ const cancelQuit = async () => {
     quitSaveError.value = ''
     window.electronAPI.resolveQuit(false)
     await nextTick()
-    if (updateStatus.value?.status === 'downloaded') {
-        hasDismissedUpdate.value = false
-        isUpdateDialogOpen.value = true
-    }
     if (currentPage.value === 'list') noteListPage.value?.focus()
     else memoEditor.value?.focus()
 }
@@ -204,21 +198,19 @@ const saveAndQuit = async () => {
     }
 }
 
-const dismissUpdateDialog = () => {
-    hasDismissedUpdate.value = true
-    isUpdateDialogOpen.value = false
+const restartToInstallUpdate = () => {
+    window.electronAPI.requestUpdateInstall()
 }
 
-const restartToInstallUpdate = () => {
-    isUpdateDialogOpen.value = false
-    window.electronAPI.requestUpdateInstall()
+const setPreviewUpdateStatus = (status: UpdateStatus | null) => {
+    if (!updatePreviewEnabled.value) return
+    updateStatus.value = status
 }
 
 const handleWindowKeydown = (event: KeyboardEvent) => {
     if (event.isComposing) return
 
     if (isQuitDialogOpen.value) return
-    if (isUpdateDialogOpen.value) return
 
     if (pendingAction.value) {
         if (event.key === 'Escape') {
@@ -261,17 +253,10 @@ onMounted(() => {
     window.addEventListener('keydown', handleWindowKeydown)
     window.electronAPI.onQuitRequest(requestQuit)
     window.electronAPI.onUpdateStatus((status) => {
-        if (status.status === 'error') {
-            if (isUpdateDialogOpen.value) updateStatus.value = status
-            return
-        }
         updateStatus.value = status
-        if (status.status === 'downloaded') {
-            hasDismissedUpdate.value = false
-            isUpdateDialogOpen.value = true
-        } else if (!hasDismissedUpdate.value) {
-            isUpdateDialogOpen.value = true
-        }
+    })
+    void window.electronAPI.isUpdatePreviewEnabled().then((enabled) => {
+        updatePreviewEnabled.value = enabled
     })
     window.electronAPI.readyForQuitRequests()
     window.electronAPI.onShow(() => {
@@ -295,7 +280,12 @@ onUnmounted(() => {
             <MemoHeader
                 :filename="currentFilename"
                 :is-dirty="isDirty"
+                :update-status="updateStatus"
+                :update-preview-enabled="updatePreviewEnabled"
                 @close="hideWindow"
+                @dismiss-update="updateStatus = null"
+                @restart-update="restartToInstallUpdate"
+                @preview-update-status="setPreviewUpdateStatus"
             />
             <MemoEditor
                 ref="memoEditor"
@@ -315,9 +305,14 @@ onUnmounted(() => {
         <NoteListPage
             v-else
             ref="noteListPage"
+            :update-status="updateStatus"
+            :update-preview-enabled="updatePreviewEnabled"
             @back="returnToMemo"
             @open="openNote"
             @deleted="handleNoteDeleted"
+            @dismiss-update="updateStatus = null"
+            @restart-update="restartToInstallUpdate"
+            @preview-update-status="setPreviewUpdateStatus"
         />
         <ConfirmDiscardDialog
             v-if="pendingAction"
@@ -333,12 +328,6 @@ onUnmounted(() => {
             @save="saveAndQuit"
             @discard="discardAndQuit"
             @cancel="cancelQuit"
-        />
-        <UpdateDialog
-            v-if="isUpdateDialogOpen && updateStatus"
-            :status="updateStatus"
-            @later="dismissUpdateDialog"
-            @restart="restartToInstallUpdate"
         />
         <p class="backdrop-tip">
             <kbd>Esc</kbd>

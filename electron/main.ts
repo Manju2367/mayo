@@ -18,6 +18,7 @@ let isQuitAllowed = false
 let installUpdateAfterQuit = false
 let availableUpdateVersion: string | null = null
 let updateDownloaded = false
+const isUpdatePreviewEnabled = !app.isPackaged && process.argv.includes('--preview-updates')
 
 autoUpdater.autoDownload = true
 autoUpdater.autoInstallOnAppQuit = false
@@ -245,6 +246,7 @@ app.whenReady().then(() => {
     ipcMain.handle('openNote', (e, filename: string) => apiFuncs.openNote(filename))
     ipcMain.handle('deleteNote', (e, filename: string) => apiFuncs.deleteNote(filename))
     ipcMain.handle('hideWindow', (e) => apiFuncs.hideWindow())
+    ipcMain.handle('is-update-preview-enabled', () => isUpdatePreviewEnabled)
     ipcMain.on('renderer-ready-for-quit', (e) => {
         if (e.sender !== mainWindow?.webContents) return
         rendererReadyForQuit = true

@@ -1,13 +1,23 @@
 <script setup lang="ts">
 import { nextTick, onMounted, ref } from 'vue'
 import type { NoteDocument, NoteSummary } from '../../electron/shared/electron-api'
+import type { UpdateStatus } from '../../electron/shared/electron-api'
 import PageHeading from './PageHeading.vue'
 import ConfirmDeleteDialog from './ConfirmDeleteDialog.vue'
+import UpdateStatusBar from './UpdateStatusBar.vue'
+
+defineProps<{
+    updateStatus: UpdateStatus | null
+    updatePreviewEnabled: boolean
+}>()
 
 const emit = defineEmits<{
     back: []
     open: [note: NoteDocument]
     deleted: [filename: string]
+    dismissUpdate: []
+    restartUpdate: []
+    previewUpdateStatus: [status: UpdateStatus | null]
 }>()
 
 const panel = ref<HTMLElement | null>(null)
@@ -177,6 +187,13 @@ onMounted(() => {
     <section ref="panel" class="memo-card note-list-card" aria-labelledby="notes-title" tabindex="-1" @keydown="handleListKeydown">
         <header class="memo-header note-list-header">
             <PageHeading eyebrow="MAYO / YOUR NOTES" title="保存したメモ" title-id="notes-title" />
+            <UpdateStatusBar
+                :status="updateStatus"
+                :preview-enabled="updatePreviewEnabled"
+                @dismiss="emit('dismissUpdate')"
+                @restart="emit('restartUpdate')"
+                @preview-status="emit('previewUpdateStatus', $event)"
+            />
             <button class="back-button" type="button" @click="$emit('back')">
                 <span aria-hidden="true">←</span>
                 <span>メモへ戻る</span>

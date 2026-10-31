@@ -1,13 +1,20 @@
 <script setup lang="ts">
 import PageHeading from './PageHeading.vue'
+import UpdateStatusBar from './UpdateStatusBar.vue'
+import type { UpdateStatus } from '../../electron/shared/electron-api'
 
 defineProps<{
     filename: string | null
     isDirty: boolean
+    updateStatus: UpdateStatus | null
+    updatePreviewEnabled: boolean
 }>()
 
 defineEmits<{
     close: []
+    dismissUpdate: []
+    restartUpdate: []
+    previewUpdateStatus: [status: UpdateStatus | null]
 }>()
 </script>
 
@@ -27,6 +34,13 @@ defineEmits<{
                 </div>
             </template>
         </PageHeading>
+        <UpdateStatusBar
+            :status="updateStatus"
+            :preview-enabled="updatePreviewEnabled"
+            @dismiss="$emit('dismissUpdate')"
+            @restart="$emit('restartUpdate')"
+            @preview-status="$emit('previewUpdateStatus', $event)"
+        />
         <button
             class="icon-button close-button"
             type="button"

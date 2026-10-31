@@ -20,6 +20,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "electron .",
+    "start:update-preview": "electron . --preview-updates",
     "build": "npx vite build && npx tsc -p tsconfig.electron.json",
     "package:win": "npm run build && electron-builder --win nsis --publish never",
     "release:win": "npm run build && electron-builder --win nsis --publish onTag"

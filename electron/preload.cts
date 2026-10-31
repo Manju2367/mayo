@@ -16,6 +16,7 @@ const api: ElectronAPI = {
     resolveQuit: (shouldQuit) => ipcRenderer.send('resolve-quit', shouldQuit),
     requestUpdateInstall: () => ipcRenderer.send('request-update-install'),
     onUpdateStatus: (callback) => ipcRenderer.on('update-status', (_event: any, status: UpdateStatus) => callback(status)),
+    isUpdatePreviewEnabled: () => ipcRenderer.invoke('is-update-preview-enabled'),
     hideWindow: () => ipcRenderer.invoke('hideWindow'),
 
     onShow: (callback) => ipcRenderer.on('show', (_event: any) => callback())
