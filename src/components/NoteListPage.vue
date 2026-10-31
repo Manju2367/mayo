@@ -194,7 +194,7 @@ onMounted(() => {
                 @restart="emit('restartUpdate')"
                 @preview-status="emit('previewUpdateStatus', $event)"
             />
-            <button class="back-button" type="button" @click="$emit('back')">
+            <button class="back-button" type="button" tabindex="-1" @click="$emit('back')">
                 <span aria-hidden="true">←</span>
                 <span>メモへ戻る</span>
             </button>
@@ -204,8 +204,8 @@ onMounted(() => {
             <table class="note-table">
                 <thead>
                     <tr>
-                        <th scope="col">ファイル名</th>
-                        <th scope="col">更新日時</th>
+                        <th scope="col" tabindex="0">ファイル名</th>
+                        <th scope="col" tabindex="0">更新日時</th>
                         <th scope="col"><span class="sr-only">操作</span></th>
                     </tr>
                 </thead>
@@ -221,6 +221,7 @@ onMounted(() => {
                             <button
                                 class="note-open-button"
                                 type="button"
+                                tabindex="-1"
                                 :data-note-index="index"
                                 :disabled="isOpening"
                                 @focus="selectedIndex = index"
@@ -237,6 +238,7 @@ onMounted(() => {
                             <button
                                 class="note-delete-button"
                                 type="button"
+                                tabindex="-1"
                                 :data-note-index="index"
                                 :aria-label="`${note.filename}を削除`"
                                 :disabled="isDeleting"

@@ -76,6 +76,7 @@ const handleRestart = () => {
                 v-if="status.status === 'downloaded'"
                 class="update-apply-button"
                 type="button"
+                tabindex="-1"
                 @click="handleRestart"
             >
                 再起動して適用
@@ -84,6 +85,7 @@ const handleRestart = () => {
                 v-if="status.status === 'error'"
                 class="update-dismiss-button"
                 type="button"
+                tabindex="-1"
                 aria-label="更新通知を閉じる"
                 @click="emit('dismiss')"
             >×</button>
@@ -93,6 +95,7 @@ const handleRestart = () => {
             <span class="update-preview-label">更新プレビュー</span>
             <select
                 :value="status?.status ?? ''"
+                tabindex="-1"
                 aria-label="プレビューする更新状態"
                 @change="changePreviewStatus"
             >
@@ -108,6 +111,7 @@ const handleRestart = () => {
                 min="0"
                 max="100"
                 :value="status.percent"
+                tabindex="-1"
                 aria-label="プレビュー進捗率"
                 @input="changePreviewProgress"
             >
