@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { nextTick, onMounted, ref } from 'vue'
+import { computed, nextTick, onMounted, ref } from 'vue'
 import type { NoteDocument, NoteSummary } from '../../electron/shared/electron-api'
 import type { UpdateStatus } from '../../electron/shared/electron-api'
 import PageHeading from './PageHeading.vue'
@@ -22,6 +22,10 @@ const emit = defineEmits<{
 
 const panel = ref<HTMLElement | null>(null)
 const notes = ref<NoteSummary[]>([])
+type SortKey = 'filename' | 'updatedAt'
+type SortDirection = 'asc' | 'desc'
+const sortKey = ref<SortKey>('updatedAt')
+const sortDirection = ref<SortDirection>('desc')
 const isLoading = ref(true)
 const errorMessage = ref('')
 const selectedIndex = ref(-1)
@@ -36,6 +40,38 @@ const formatUpdatedAt = (timestamp: number) =>
         dateStyle: 'medium',
         timeStyle: 'short'
     }).format(timestamp)
+
+const sortedNotes = computed(() => [...notes.value].sort((left, right) => {
+    const comparison = sortKey.value === 'filename'
+        ? left.filename.localeCompare(right.filename, 'ja-JP', { numeric: true, sensitivity: 'base' })
+        : left.updatedAt - right.updatedAt
+
+    return comparison * (sortDirection.value === 'asc' ? 1 : -1)
+}))
+
+const sortSummary = computed(() => {
+    const direction = sortDirection.value === 'asc' ? '昇順' : '降順'
+    return sortKey.value === 'filename'
+        ? `ファイル名の${direction}`
+        : sortDirection.value === 'asc'
+            ? '更新日時の古い順'
+            : '更新日時の新しい順'
+})
+
+const toggleSort = (key: SortKey) => {
+    const selectedFilename = sortedNotes.value[selectedIndex.value]?.filename
+
+    if (sortKey.value === key) {
+        sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc'
+    } else {
+        sortKey.value = key
+        sortDirection.value = 'asc'
+    }
+
+    if (selectedFilename) {
+        selectedIndex.value = sortedNotes.value.findIndex((note) => note.filename === selectedFilename)
+    }
+}
 
 const loadNotes = async () => {
     isLoading.value = true
@@ -53,7 +89,7 @@ const loadNotes = async () => {
 const focus = () => panel.value?.focus()
 
 const openSelected = async () => {
-    const note = notes.value[selectedIndex.value]
+    const note = sortedNotes.value[selectedIndex.value]
     if (!note || isOpening.value) return
 
     isOpening.value = true
@@ -68,8 +104,8 @@ const openSelected = async () => {
 }
 
 const selectNote = async (index: number, shouldFocus = false) => {
-    if (notes.value.length === 0) return
-    selectedIndex.value = (index + notes.value.length) % notes.value.length
+    if (sortedNotes.value.length === 0) return
+    selectedIndex.value = (index + sortedNotes.value.length) % sortedNotes.value.length
     if (shouldFocus) {
         await nextTick()
         const button = panel.value?.querySelector<HTMLButtonElement>(`[data-note-index="${selectedIndex.value}"]`)
@@ -113,15 +149,15 @@ const deleteNote = async (note: NoteSummary) => {
 
     isDeleting.value = true
     deleteError.value = ''
-    const deletedIndex = notes.value.findIndex((item) => item.filename === note.filename)
+    const deletedIndex = sortedNotes.value.findIndex((item) => item.filename === note.filename)
     try {
         await window.electronAPI.deleteNote(note.filename)
         emit('deleted', note.filename)
         notes.value = notes.value.filter((item) => item.filename !== note.filename)
-        if (notes.value.length === 0) {
+        if (sortedNotes.value.length === 0) {
             selectedIndex.value = -1
         } else {
-            selectedIndex.value = Math.min(Math.max(deletedIndex, 0), notes.value.length - 1)
+            selectedIndex.value = Math.min(Math.max(deletedIndex, 0), sortedNotes.value.length - 1)
             await selectNote(selectedIndex.value, true)
         }
     } catch {
@@ -204,14 +240,42 @@ onMounted(() => {
             <table class="note-table">
                 <thead>
                     <tr>
-                        <th scope="col" tabindex="0">ファイル名</th>
-                        <th scope="col" tabindex="0">更新日時</th>
+                        <th
+                            scope="col"
+                            tabindex="0"
+                            class="is-sortable"
+                            :aria-sort="sortKey === 'filename' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'"
+                            @click="toggleSort('filename')"
+                            @keydown.enter.stop.prevent="toggleSort('filename')"
+                        >
+                            <span class="sortable-heading">
+                                <span>ファイル名</span>
+                                <span v-if="sortKey === 'filename'" class="sort-indicator" aria-hidden="true">
+                                    {{ sortDirection === 'asc' ? '▲' : '▼' }}
+                                </span>
+                            </span>
+                        </th>
+                        <th
+                            scope="col"
+                            tabindex="0"
+                            class="is-sortable"
+                            :aria-sort="sortKey === 'updatedAt' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'"
+                            @click="toggleSort('updatedAt')"
+                            @keydown.enter.stop.prevent="toggleSort('updatedAt')"
+                        >
+                            <span class="sortable-heading">
+                                <span>更新日時</span>
+                                <span v-if="sortKey === 'updatedAt'" class="sort-indicator" aria-hidden="true">
+                                    {{ sortDirection === 'asc' ? '▲' : '▼' }}
+                                </span>
+                            </span>
+                        </th>
                         <th scope="col"><span class="sr-only">操作</span></th>
                     </tr>
                 </thead>
                 <tbody v-if="notes.length > 0">
                     <tr
-                        v-for="(note, index) in notes"
+                        v-for="(note, index) in sortedNotes"
                         :key="note.filename"
                         :class="{ 'is-selected': selectedIndex === index }"
                         @click="selectedIndex = index; openSelected()"
@@ -262,7 +326,7 @@ onMounted(() => {
 
         <footer class="memo-footer note-list-footer">
             <div class="footer-meta">
-                <span>更新日時の新しい順</span>
+                <span>{{ sortSummary }}</span>
                 <span>{{ notes.length }} 件</span>
             </div>
             <div class="footer-actions">

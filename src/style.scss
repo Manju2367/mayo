@@ -287,6 +287,10 @@ kbd {
     font-weight: 500;
 }
 .note-table th:focus-visible { outline: 2px solid var(--accent); outline-offset: -3px; }
+.note-table th.is-sortable { cursor: pointer; }
+.note-table th.is-sortable:hover { color: #5f6571; }
+.sortable-heading { display: inline-flex; align-items: center; gap: 6px; }
+.sort-indicator { color: var(--accent); font-size: 9px; }
 .note-table th:first-child { width: 58%; }
 .note-table th:last-child { width: 44px; padding-right: 5px; padding-left: 5px; }
 .note-table td { padding: 13px 14px; border-top: 1px solid #f0f1f4; font-size: 12px; }
