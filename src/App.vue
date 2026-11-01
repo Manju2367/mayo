@@ -6,7 +6,7 @@ import MemoHeader from './components/MemoHeader.vue'
 import NoteListPage from './components/NoteListPage.vue'
 import ConfirmDiscardDialog from './components/ConfirmDiscardDialog.vue'
 import ConfirmQuitDialog from './components/ConfirmQuitDialog.vue'
-import type { NoteDocument, UpdateStatus } from '../electron/shared/electron-api'
+import type { InputDebugEvent, InputDebugTarget, NoteDocument, UpdateStatus } from '../electron/shared/electron-api'
 
 const placeholderOptions = [
     'メモを書き留める',
@@ -249,6 +249,75 @@ const handleWindowKeydown = (event: KeyboardEvent) => {
     }
 }
 
+const describeInputTarget = (element: Element | null): InputDebugTarget | null => {
+    if (!element) return null
+
+    const interactive = element.closest('button, a, input, textarea, select, [role="button"], [tabindex]') ?? element
+    const tagName = interactive.tagName.toLowerCase()
+    const isNoteName = interactive.matches('.note-open-button')
+    const isTableHeader = interactive.matches('th')
+    const label = isNoteName || isTableHeader
+        ? (interactive.textContent ?? '').trim().slice(0, 100)
+        : ''
+
+    return {
+        tagName,
+        id: interactive.id,
+        className: interactive.getAttribute('class') ?? '',
+        role: interactive.getAttribute('role') ?? '',
+        ariaLabel: interactive.getAttribute('aria-label') ?? '',
+        label,
+        noteIndex: interactive.getAttribute('data-note-index') ?? '',
+        tabIndex: interactive instanceof HTMLElement ? interactive.tabIndex : -1
+    }
+}
+
+const logInputEvent = (event: Event) => {
+    const rawTarget = event.target instanceof Element ? event.target : null
+    const eventTarget = rawTarget
+    const target = rawTarget?.closest('button, a, input, textarea, select, [role="button"], [tabindex]') ?? rawTarget
+    const focusedTarget = describeInputTarget(document.activeElement)
+    const payload: InputDebugEvent = {
+        eventType: event.type as InputDebugEvent['eventType'],
+        eventTarget: eventTarget ? {
+            tagName: eventTarget.tagName.toLowerCase(),
+            id: eventTarget.id,
+            className: eventTarget.getAttribute('class') ?? '',
+            role: eventTarget.getAttribute('role') ?? '',
+            ariaLabel: eventTarget.getAttribute('aria-label') ?? '',
+            label: '',
+            noteIndex: eventTarget.getAttribute('data-note-index') ?? '',
+            tabIndex: eventTarget instanceof HTMLElement ? eventTarget.tabIndex : -1
+        } : null,
+        target: describeInputTarget(target),
+        focusedTarget,
+        defaultPrevented: event.defaultPrevented
+    }
+
+    if (event instanceof KeyboardEvent) {
+        const hasModifier = event.ctrlKey || event.metaKey || event.altKey
+        payload.key = event.key.length === 1 && !hasModifier ? '[printable]' : event.key
+        payload.ctrlKey = event.ctrlKey
+        payload.shiftKey = event.shiftKey
+        payload.altKey = event.altKey
+        payload.metaKey = event.metaKey
+        payload.isComposing = event.isComposing
+        payload.repeat = event.repeat
+    } else if (event instanceof PointerEvent) {
+        payload.button = event.button
+        payload.pointerType = event.pointerType
+    } else if (event instanceof MouseEvent) {
+        payload.button = event.button
+        payload.detail = event.detail
+    }
+
+    // Capture phaseで記録するとVue側のpreventDefaultより先になるため、伝播完了後に状態を確定する。
+    window.setTimeout(() => {
+        payload.defaultPrevented = event.defaultPrevented
+        window.electronAPI.logInputDebugEvent(payload)
+    }, 0)
+}
+
 onMounted(() => {
     window.addEventListener('keydown', handleWindowKeydown)
     window.electronAPI.onQuitRequest(requestQuit)
@@ -264,10 +333,19 @@ onMounted(() => {
         else memoEditor.value?.focus()
     })
     memoEditor.value?.focus()
+    void window.electronAPI.isInputDebugEnabled().then((enabled) => {
+        if (!enabled) return
+        document.addEventListener('keydown', logInputEvent, true)
+        document.addEventListener('pointerdown', logInputEvent, true)
+        document.addEventListener('click', logInputEvent, true)
+    })
 })
 
 onUnmounted(() => {
     window.removeEventListener('keydown', handleWindowKeydown)
+    document.removeEventListener('keydown', logInputEvent, true)
+    document.removeEventListener('pointerdown', logInputEvent, true)
+    document.removeEventListener('click', logInputEvent, true)
 })
 </script>
 

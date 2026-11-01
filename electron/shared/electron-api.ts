@@ -14,6 +14,35 @@ export type UpdateStatus =
     | { status: 'downloaded'; version: string }
     | { status: 'error'; message: string }
 
+export interface InputDebugTarget {
+    tagName: string
+    id: string
+    className: string
+    role: string
+    ariaLabel: string
+    label: string
+    noteIndex: string
+    tabIndex: number
+}
+
+export interface InputDebugEvent {
+    eventType: 'keydown' | 'pointerdown' | 'click'
+    eventTarget: InputDebugTarget | null
+    target: InputDebugTarget | null
+    focusedTarget: InputDebugTarget | null
+    defaultPrevented: boolean
+    key?: string
+    ctrlKey?: boolean
+    shiftKey?: boolean
+    altKey?: boolean
+    metaKey?: boolean
+    isComposing?: boolean
+    repeat?: boolean
+    button?: number
+    detail?: number
+    pointerType?: string
+}
+
 export default interface ElectronAPI {
     // funcs
     log(...args: Array<any>): void,
@@ -28,6 +57,8 @@ export default interface ElectronAPI {
     requestUpdateInstall(): void,
     onUpdateStatus(callback: (status: UpdateStatus) => void): void,
     isUpdatePreviewEnabled(): Promise<boolean>,
+    isInputDebugEnabled(): Promise<boolean>,
+    logInputDebugEvent(event: InputDebugEvent): void,
     hideWindow(): void,
 
     // events

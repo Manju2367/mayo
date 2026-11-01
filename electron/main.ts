@@ -3,9 +3,9 @@ import path from 'node:path'
 import * as C from './constsns.js'
 import type ElectronAPI from './shared/electron-api.js'
 import { existsSync } from 'node:fs'
-import { mkdir, readFile, readdir, rename, stat, unlink, writeFile } from 'node:fs/promises'
+import { appendFile, mkdir, readFile, readdir, rename, stat, unlink, writeFile } from 'node:fs/promises'
 import electronUpdater from 'electron-updater'
-import type { UpdateStatus } from './shared/electron-api.js'
+import type { InputDebugEvent, UpdateStatus } from './shared/electron-api.js'
 
 const { autoUpdater } = electronUpdater
 
@@ -19,6 +19,10 @@ let installUpdateAfterQuit = false
 let availableUpdateVersion: string | null = null
 let updateDownloaded = false
 const isUpdatePreviewEnabled = !app.isPackaged && process.argv.includes('--preview-updates')
+const isInputDebugEnabled = process.argv.includes('--debug-input-log')
+let inputDebugLogPath: string | null = null
+let inputDebugWriteQueue = Promise.resolve()
+let inputDebugLogReady = Promise.resolve()
 
 autoUpdater.autoDownload = true
 autoUpdater.autoInstallOnAppQuit = false
@@ -237,6 +241,15 @@ const apiFuncs: Pick<ElectronAPI,
 
 
 app.whenReady().then(() => {
+    if (isInputDebugEnabled) {
+        inputDebugLogPath = path.join(app.getPath('userData'), 'input-debug.log')
+        const logPath = inputDebugLogPath
+        inputDebugLogReady = mkdir(path.dirname(logPath), { recursive: true })
+            .then(() => writeFile(logPath, `# Mayo input debug session ${new Date().toISOString()}\n`, 'utf-8'))
+            .then(() => console.info(`入力デバッグログ: ${logPath}`))
+            .catch((error: unknown) => console.error('入力デバッグログを初期化できませんでした。', error))
+    }
+
     // handle funcs
     ipcMain.handle('log', (e, args: Array<any>) => apiFuncs.log(args))
     ipcMain.handle('send', (e, message: string, currentFilename: string | null) =>
@@ -247,6 +260,17 @@ app.whenReady().then(() => {
     ipcMain.handle('deleteNote', (e, filename: string) => apiFuncs.deleteNote(filename))
     ipcMain.handle('hideWindow', (e) => apiFuncs.hideWindow())
     ipcMain.handle('is-update-preview-enabled', () => isUpdatePreviewEnabled)
+    ipcMain.handle('is-input-debug-enabled', () => isInputDebugEnabled)
+    ipcMain.on('input-debug-event', (event, payload: InputDebugEvent) => {
+        if (!isInputDebugEnabled || !inputDebugLogPath || event.sender !== mainWindow?.webContents) return
+        if (!payload || !['keydown', 'pointerdown', 'click'].includes(payload.eventType)) return
+
+        const record = { timestamp: new Date().toISOString(), ...payload }
+        inputDebugWriteQueue = inputDebugWriteQueue
+            .then(() => inputDebugLogReady)
+            .then(() => appendFile(inputDebugLogPath!, `${JSON.stringify(record)}\n`, 'utf-8'))
+            .catch((error: unknown) => console.error('入力デバッグログを書き込めませんでした。', error))
+    })
     ipcMain.on('renderer-ready-for-quit', (e) => {
         if (e.sender !== mainWindow?.webContents) return
         rendererReadyForQuit = true

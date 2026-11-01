@@ -1,6 +1,6 @@
 const { contextBridge, ipcRenderer } = require('electron')
 import type ElectronAPI from './shared/electron-api'
-import type { UpdateStatus } from './shared/electron-api'
+import type { InputDebugEvent, UpdateStatus } from './shared/electron-api'
 
 
 
@@ -17,6 +17,8 @@ const api: ElectronAPI = {
     requestUpdateInstall: () => ipcRenderer.send('request-update-install'),
     onUpdateStatus: (callback) => ipcRenderer.on('update-status', (_event: any, status: UpdateStatus) => callback(status)),
     isUpdatePreviewEnabled: () => ipcRenderer.invoke('is-update-preview-enabled'),
+    isInputDebugEnabled: () => ipcRenderer.invoke('is-input-debug-enabled'),
+    logInputDebugEvent: (event: InputDebugEvent) => ipcRenderer.send('input-debug-event', event),
     hideWindow: () => ipcRenderer.invoke('hideWindow'),
 
     onShow: (callback) => ipcRenderer.on('show', (_event: any) => callback())
