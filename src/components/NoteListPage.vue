@@ -59,8 +59,6 @@ const sortSummary = computed(() => {
 })
 
 const toggleSort = (key: SortKey) => {
-    const selectedFilename = sortedNotes.value[selectedIndex.value]?.filename
-
     if (sortKey.value === key) {
         sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc'
     } else {
@@ -68,9 +66,7 @@ const toggleSort = (key: SortKey) => {
         sortDirection.value = 'asc'
     }
 
-    if (selectedFilename) {
-        selectedIndex.value = sortedNotes.value.findIndex((note) => note.filename === selectedFilename)
-    }
+    selectedIndex.value = -1
 }
 
 const loadNotes = async () => {
