@@ -63,7 +63,7 @@ const toggleSort = (key: SortKey) => {
         sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc'
     } else {
         sortKey.value = key
-        sortDirection.value = 'asc'
+        sortDirection.value = key === 'updatedAt' ? 'desc' : 'asc'
     }
 
     selectedIndex.value = -1
