@@ -80,6 +80,7 @@ function burst(){
 function clearGlobs(){globs.forEach(o=>o.el.remove());globs=[]}
 
 $('#icon').addEventListener('click',()=>{
+  window.parent.postMessage({type:'mayo-brand-mark-activated'},'*');
   if(st.flyDir!==0||st.mode==='bursting')return;
   if(st.mode==='closed'){
     st.clicks++;

@@ -249,6 +249,16 @@ const handleWindowKeydown = (event: KeyboardEvent) => {
     }
 }
 
+const handleBrandMarkActivation = (event: MessageEvent) => {
+    if (event.data?.type !== 'mayo-brand-mark-activated') return
+
+    const brandFrame = document.querySelector<HTMLIFrameElement>('.brand-mark')
+    if (!brandFrame || event.source !== brandFrame.contentWindow) return
+
+    if (currentPage.value === 'list') noteListPage.value?.focus()
+    else memoEditor.value?.focus()
+}
+
 const describeInputTarget = (element: Element | null): InputDebugTarget | null => {
     if (!element) return null
 
@@ -320,6 +330,7 @@ const logInputEvent = (event: Event) => {
 
 onMounted(() => {
     window.addEventListener('keydown', handleWindowKeydown)
+    window.addEventListener('message', handleBrandMarkActivation)
     window.electronAPI.onQuitRequest(requestQuit)
     window.electronAPI.onUpdateStatus((status) => {
         updateStatus.value = status
@@ -343,6 +354,7 @@ onMounted(() => {
 
 onUnmounted(() => {
     window.removeEventListener('keydown', handleWindowKeydown)
+    window.removeEventListener('message', handleBrandMarkActivation)
     document.removeEventListener('keydown', logInputEvent, true)
     document.removeEventListener('pointerdown', logInputEvent, true)
     document.removeEventListener('click', logInputEvent, true)
