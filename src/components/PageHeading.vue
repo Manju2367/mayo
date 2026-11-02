@@ -10,7 +10,7 @@ defineProps<{
 
 <template>
     <div class="page-heading">
-        <img class="brand-mark" :src="brandIcon" alt="">
+        <iframe class="brand-mark" src="/mayo-icon-embed.html" frameborder="0" allowtransparency="true"></iframe>
         <div class="heading-copy">
             <p class="eyebrow">{{ eyebrow }}</p>
             <h1 :id="titleId">{{ title }}</h1>
