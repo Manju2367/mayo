@@ -69,6 +69,28 @@ const toggleSort = (key: SortKey) => {
     selectedIndex.value = -1
 }
 
+const handleSortableHeaderKeydown = (event: KeyboardEvent, key: SortKey) => {
+    if (event.key === 'Enter') {
+        event.preventDefault()
+        event.stopPropagation()
+        toggleSort(key)
+        return
+    }
+
+    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return
+
+    const currentHeader = event.currentTarget as HTMLTableCellElement
+    const headers = Array.from(currentHeader.closest('tr')?.querySelectorAll<HTMLTableCellElement>('th.is-sortable') ?? [])
+    const currentIndex = headers.indexOf(currentHeader)
+    const direction = event.key === 'ArrowRight' ? 1 : -1
+    const adjacentHeader = headers[currentIndex + direction]
+
+    if (!adjacentHeader) return
+
+    event.preventDefault()
+    adjacentHeader.focus()
+}
+
 const loadNotes = async () => {
     isLoading.value = true
     errorMessage.value = ''
@@ -242,7 +264,7 @@ onMounted(() => {
                             class="is-sortable"
                             :aria-sort="sortKey === 'filename' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'"
                             @click="toggleSort('filename')"
-                            @keydown.enter.stop.prevent="toggleSort('filename')"
+                            @keydown="handleSortableHeaderKeydown($event, 'filename')"
                         >
                             <span class="sortable-heading">
                                 <span>ファイル名</span>
@@ -257,7 +279,7 @@ onMounted(() => {
                             class="is-sortable"
                             :aria-sort="sortKey === 'updatedAt' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'"
                             @click="toggleSort('updatedAt')"
-                            @keydown.enter.stop.prevent="toggleSort('updatedAt')"
+                            @keydown="handleSortableHeaderKeydown($event, 'updatedAt')"
                         >
                             <span class="sortable-heading">
                                 <span>更新日時</span>
