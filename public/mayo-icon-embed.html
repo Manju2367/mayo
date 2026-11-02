@@ -79,6 +79,33 @@ function burst(){
 }
 function clearGlobs(){globs.forEach(o=>o.el.remove());globs=[]}
 
+const animationStateKey='mayo-brand-mark-animation-state';
+function saveAnimationState(){
+  try{
+    const mode=st.mode==='bursting'?'open':st.mode;
+    sessionStorage.setItem(animationStateKey,JSON.stringify({
+      mode,clicks:st.clicks,phase:st.phase,phaseT:st.phaseT,lift:st.lift,liftT:st.liftT,
+      fly:mode==='open'?1:st.fly,flyDir:mode==='open'?0:st.flyDir
+    }));
+  }catch{}
+}
+function restoreAnimationState(){
+  try{
+    const saved=JSON.parse(sessionStorage.getItem(animationStateKey)||'null');
+    if(!saved||!['closed','opening','open'].includes(saved.mode))return;
+    st.mode=saved.mode;
+    for(const key of ['clicks','phase','phaseT','lift','liftT','fly','flyDir']){
+      if(Number.isFinite(saved[key]))st[key]=saved[key];
+    }
+    if(st.mode==='open'){
+      st.fly=1;st.flyDir=0;capG.style.display='none';
+    }
+  }catch{}
+}
+restoreAnimationState();
+window.addEventListener('pagehide',saveAnimationState);
+window.addEventListener('unload',saveAnimationState);
+
 $('#icon').addEventListener('click',()=>{
   window.parent.postMessage({type:'mayo-brand-mark-activated'},'*');
   if(st.flyDir!==0||st.mode==='bursting')return;
