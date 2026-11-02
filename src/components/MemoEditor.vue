@@ -51,7 +51,6 @@ defineExpose({ focus })
         name="memo"
         :placeholder="placeholder"
         spellcheck="false"
-        autofocus
         @input="handleInput"
         @keydown="handleKeydown"
     ></textarea>
