@@ -10,7 +10,7 @@ defineProps<{
 
 <template>
     <div class="page-heading">
-        <iframe class="brand-mark" :src="brandMarkSrc" frameborder="0" allowtransparency="true"></iframe>
+        <iframe class="brand-mark" :src="brandMarkSrc" frameborder="0" allowtransparency="true" tabindex="-1"></iframe>
         <div class="heading-copy">
             <p class="eyebrow">{{ eyebrow }}</p>
             <h1 :id="titleId">{{ title }}</h1>
