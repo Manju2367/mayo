@@ -462,6 +462,7 @@ kbd {
     font-size: 9px;
 }
 .update-apply-button:hover { background: var(--accent-hover); }
+.update-shortcut-hint { flex: 0 0 auto; color: var(--muted); font-size: 9px; white-space: nowrap; }
 .update-dismiss-button {
     padding: 0 1px;
     border: 0;

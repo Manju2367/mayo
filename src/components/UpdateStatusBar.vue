@@ -77,10 +77,16 @@ const handleRestart = () => {
                 class="update-apply-button"
                 type="button"
                 tabindex="-1"
+                aria-keyshortcuts="Control+Shift+U"
                 @click="handleRestart"
             >
                 再起動して適用
             </button>
+            <span
+                v-if="status.status === 'downloaded' && !previewEnabled"
+                class="update-shortcut-hint"
+                aria-hidden="true"
+            >Ctrl+Shift+U</span>
             <button
                 v-if="status.status === 'error'"
                 class="update-dismiss-button"
