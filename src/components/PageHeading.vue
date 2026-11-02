@@ -1,6 +1,4 @@
 <script setup lang="ts">
-const brandIcon = `${import.meta.env.BASE_URL}icon-bg-512.png`
-
 defineProps<{
     eyebrow: string
     title: string
