@@ -249,6 +249,16 @@ const handleWindowKeydown = (event: KeyboardEvent) => {
     }
 }
 
+const handleInputModalityKeydown = (event: KeyboardEvent) => {
+    if (event.isComposing || event.key === 'Shift' || event.key === 'Control' || event.key === 'Alt' || event.key === 'Meta') return
+    document.documentElement.classList.add('is-keyboard-mode')
+}
+
+const handlePointerActivity = (event: PointerEvent) => {
+    if (event.pointerType !== 'mouse') return
+    document.documentElement.classList.remove('is-keyboard-mode')
+}
+
 const handleBrandMarkActivation = (event: MessageEvent) => {
     if (event.data?.type !== 'mayo-brand-mark-activated') return
 
@@ -330,6 +340,9 @@ const logInputEvent = (event: Event) => {
 
 onMounted(() => {
     window.addEventListener('keydown', handleWindowKeydown)
+    document.addEventListener('keydown', handleInputModalityKeydown, true)
+    document.addEventListener('pointermove', handlePointerActivity, true)
+    document.addEventListener('pointerdown', handlePointerActivity, true)
     window.addEventListener('message', handleBrandMarkActivation)
     window.electronAPI.onQuitRequest(requestQuit)
     window.electronAPI.onUpdateStatus((status) => {
@@ -354,6 +367,9 @@ onMounted(() => {
 
 onUnmounted(() => {
     window.removeEventListener('keydown', handleWindowKeydown)
+    document.removeEventListener('keydown', handleInputModalityKeydown, true)
+    document.removeEventListener('pointermove', handlePointerActivity, true)
+    document.removeEventListener('pointerdown', handlePointerActivity, true)
     window.removeEventListener('message', handleBrandMarkActivation)
     document.removeEventListener('keydown', logInputEvent, true)
     document.removeEventListener('pointerdown', logInputEvent, true)

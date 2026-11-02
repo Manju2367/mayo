@@ -106,6 +106,11 @@ const loadNotes = async () => {
 
 const focus = () => panel.value?.focus()
 
+const handleNoteMouseEnter = (index: number) => {
+    if (document.documentElement.classList.contains('is-keyboard-mode')) return
+    selectedIndex.value = index
+}
+
 const openSelected = async () => {
     const note = sortedNotes.value[selectedIndex.value]
     if (!note || isOpening.value) return
@@ -297,7 +302,7 @@ onMounted(() => {
                         :key="note.filename"
                         :class="{ 'is-selected': selectedIndex === index }"
                         @click="selectedIndex = index; openSelected()"
-                        @mouseenter="selectedIndex = index"
+                        @mouseenter="handleNoteMouseEnter(index)"
                     >
                         <td class="note-name-cell">
                             <button
