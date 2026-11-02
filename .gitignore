@@ -1,9 +1,13 @@
 node_modules
 
+# ビルド
 dist
 dist-electron
 release
 
+# フォルダ
 notes
+docs
 
+# ファイル
 todo.*
