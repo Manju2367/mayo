@@ -420,9 +420,13 @@ onUnmounted(() => {
             @cancel="cancelQuit"
         />
         <p class="backdrop-tip">
-            <kbd>Esc</kbd>
-            {{ currentPage === 'list' ? 'メモへ戻る' : '閉じる' }}
-            <span class="page-shortcut-hint"><kbd>Ctrl</kbd>+<kbd>L</kbd> {{ currentPage === 'list' ? 'メモへ戻る' : '一覧' }}</span>
+            <template v-if="currentPage === 'list'">
+                <kbd>Esc</kbd> / <kbd>Ctrl</kbd>+<kbd>L</kbd> メモへ戻る
+            </template>
+            <template v-else>
+                <kbd>Esc</kbd> 閉じる
+                <span class="page-shortcut-hint"><kbd>Ctrl</kbd>+<kbd>L</kbd> 一覧</span>
+            </template>
         </p>
     </main>
 </template>
