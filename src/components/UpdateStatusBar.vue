@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { onMounted, onUnmounted, ref, watch } from 'vue'
 import type { UpdateStatus } from '../../electron/shared/electron-api'
 
 const props = defineProps<{
@@ -49,6 +49,20 @@ const handleRestart = () => {
     }
     emit('restart')
 }
+
+const handleWindowKeydown = (event: KeyboardEvent) => {
+    if (event.isComposing || props.status?.status !== 'downloaded') return
+
+    const key = event.key.toLowerCase()
+    const hasModifier = event.ctrlKey || event.metaKey
+    if (!hasModifier || !event.shiftKey || event.altKey || key !== 'u') return
+
+    event.preventDefault()
+    handleRestart()
+}
+
+onMounted(() => window.addEventListener('keydown', handleWindowKeydown))
+onUnmounted(() => window.removeEventListener('keydown', handleWindowKeydown))
 </script>
 
 <template>
@@ -83,7 +97,7 @@ const handleRestart = () => {
                 再起動して適用
             </button>
             <span
-                v-if="status.status === 'downloaded' && !previewEnabled"
+                v-if="status.status === 'downloaded'"
                 class="update-shortcut-hint"
                 aria-hidden="true"
             >Ctrl+Shift+U</span>

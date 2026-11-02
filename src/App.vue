@@ -223,15 +223,6 @@ const handleWindowKeydown = (event: KeyboardEvent) => {
     const key = event.key.toLowerCase()
     const hasModifier = event.ctrlKey || event.metaKey
 
-    if (
-        hasModifier && event.shiftKey && !event.altKey && key === 'u' &&
-        updateStatus.value?.status === 'downloaded'
-    ) {
-        event.preventDefault()
-        if (!updatePreviewEnabled.value) restartToInstallUpdate()
-        return
-    }
-
     if (hasModifier && key === 'l') {
         event.preventDefault()
         if (currentPage.value === 'memo') void showNoteList()
