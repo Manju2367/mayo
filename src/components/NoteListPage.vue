@@ -175,7 +175,7 @@ const handleListKeydown = (event: KeyboardEvent) => {
     const noteIndex = target instanceof HTMLButtonElement
         ? Number(target.dataset.noteIndex)
         : -1
-    const focusedNote = noteIndex === selectedIndex.value ? notes.value[noteIndex] : undefined
+    const focusedNote = noteIndex === selectedIndex.value ? sortedNotes.value[noteIndex] : undefined
     const key = event.key.toLowerCase()
     const forceDelete = (event.ctrlKey || event.metaKey) && event.shiftKey && key === 'd'
 
