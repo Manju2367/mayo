@@ -74,16 +74,24 @@ onUnmounted(() => window.removeEventListener('keydown', handleWindowKeydown))
                     バージョン {{ status.version }} をダウンロード中…
                 </template>
                 <template v-else-if="status.status === 'downloading'">
-                    バージョン {{ status.version }} をダウンロード中（{{ Math.floor(status.percent) }}%）
+                    バージョン {{ status.version }} をダウンロード中
                 </template>
                 <template v-else-if="status.status === 'downloaded'">
-                    バージョン {{ status.version }} を適用できます
+                    バージョン {{ status.version }}
                 </template>
                 <template v-else>
                     更新を確認できませんでした
                 </template>
             </span>
-            <div v-if="status.status === 'downloading'" class="update-status-progress" aria-hidden="true">
+            <div
+                v-if="status.status === 'downloading'"
+                class="update-status-progress"
+                role="progressbar"
+                :aria-label="`バージョン ${status.version} のダウンロード進捗`"
+                :aria-valuenow="Math.floor(status.percent)"
+                aria-valuemin="0"
+                aria-valuemax="100"
+            >
                 <span :style="{ width: `${Math.max(0, Math.min(status.percent, 100))}%` }"></span>
             </div>
             <button
@@ -92,15 +100,11 @@ onUnmounted(() => window.removeEventListener('keydown', handleWindowKeydown))
                 type="button"
                 tabindex="-1"
                 aria-keyshortcuts="Control+Shift+U"
+                title="Ctrl+Shift+U で再起動して適用"
                 @click="handleRestart"
             >
                 再起動して適用
             </button>
-            <span
-                v-if="status.status === 'downloaded'"
-                class="update-shortcut-hint"
-                aria-hidden="true"
-            >Ctrl+Shift+U</span>
             <button
                 v-if="status.status === 'error'"
                 class="update-dismiss-button"

@@ -418,9 +418,9 @@ kbd {
 .update-status-bar {
     display: flex;
     width: auto;
-    max-width: min(230px, 34%);
+    max-width: 100%;
     min-width: 0;
-    flex: 0 1 auto;
+    flex: 0 0 auto;
     flex-direction: column;
     align-items: stretch;
     gap: 2px;
@@ -442,12 +442,13 @@ kbd {
     white-space: nowrap;
 }
 .update-status-content, .update-preview-controls { max-width: 100%; overflow: hidden; }
+.update-status-content { flex-wrap: wrap; }
 .update-status-mark { color: #9a783e; font-size: var(--font-size-caption); line-height: 1; }
 .update-status-message { min-width: 0; overflow: hidden; flex: 1; text-overflow: ellipsis; }
 .update-status-progress {
-    width: 36px;
+    width: 100%;
     height: 3px;
-    flex: 0 0 auto;
+    flex: 0 0 100%;
     overflow: hidden;
     border-radius: 999px;
     background: #e9e4d5;
@@ -470,7 +471,6 @@ kbd {
     font-size: var(--font-size-body-small);
 }
 .update-apply-button:hover { background: var(--accent-hover); }
-.update-shortcut-hint { flex: 0 0 auto; color: var(--muted); font-size: var(--font-size-body-small); white-space: nowrap; }
 .update-dismiss-button {
     padding: 0 1px;
     border: 0;
@@ -507,7 +507,6 @@ kbd {
     #main-container { gap: 12px; padding: 16px; }
     .memo-card { height: min(82vh, 650px); min-height: 360px; padding: 22px 20px 18px; border-radius: 16px; }
     .memo-header { padding-bottom: 18px; }
-    .update-status-bar { max-width: 42%; }
     #memo { padding: 16px 2px; font-size: 15px; }
     .footer-actions { align-items: flex-end; }
     .shortcut-hint { gap: var(--gap-compact); }
