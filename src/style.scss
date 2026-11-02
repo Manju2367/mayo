@@ -12,10 +12,14 @@
     font-synthesis: none;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
-    --muted: #89847a;
+    --muted: #716b60;
     --line: #ece9df;
     --accent: #d9343d;
     --accent-hover: #bd2730;
+    --accent-text: #c8323a;
+    --success: #267653;
+    --error: #a44745;
+    --warning-text: #745018;
     --surface: #FEFADD;
 }
 
@@ -131,7 +135,7 @@ img {
 }
 .eyebrow {
     margin: 0;
-    color: #969ba6;
+    color: var(--muted);
     font-family: 'Segoe UI', sans-serif;
     font-size: 9px;
     font-weight: 700;
@@ -187,17 +191,17 @@ img.close-button img.save-button {
     line-height: 1.9;
     letter-spacing: 0.015em;
 }
-#memo::placeholder { color: #b4b8c1; }
+#memo::placeholder { color: var(--muted); }
 
 .memo-footer { display: grid; gap: 16px; padding-top: 17px; }
 .footer-meta, .footer-actions { display: flex; align-items: center; justify-content: space-between; }
 .footer-meta { color: var(--muted); font-size: 11px; }
 .save-status, .character-count { color: var(--muted); font-size: 11px; }
 .save-status { transition: color 150ms ease; }
-.save-status.is-saved { color: #3b9a72; }
+.save-status.is-saved { color: var(--success); }
 .footer-actions { gap: 14px; }
 .shortcut-hint { display: flex; align-items: center; gap: 13px; }
-.shortcut { display: inline-flex; align-items: center; gap: 5px; color: #a0a4ae; font-size: 10px; }
+.shortcut { display: inline-flex; align-items: center; gap: 5px; color: var(--muted); font-size: 10px; }
 kbd {
     display: inline-grid;
     min-width: 21px;
@@ -208,7 +212,7 @@ kbd {
     border-radius: 5px;
     background: #fffef7;
     box-shadow: 0 1px 0 #e9e4d5;
-    color: #777d89;
+    color: var(--muted);
     font-family: 'Segoe UI', sans-serif;
     font-size: 10px;
     line-height: 1;
@@ -235,8 +239,8 @@ kbd {
 .save-button:hover { transform: translateY(-1px); background: var(--accent-hover); }
 .save-button:active { transform: translateY(0); }
 .save-button img { width: 15px; height: 15px; }
-.save-button kbd { min-width: 43px; height: 20px; border-color: rgba(255,255,255,.23); background: rgba(255,255,255,.15); box-shadow: none; color: rgba(255,255,255,.9); font-size: 9px; }
-.backdrop-tip { margin: 0; color: rgba(255, 255, 255, 0.78); font-size: 11px; letter-spacing: 0.02em; -webkit-app-region: no-drag; }
+.save-button kbd { min-width: 43px; height: 20px; border-color: rgba(255,255,255,.55); background: transparent; box-shadow: none; color: #fff; font-size: 9px; }
+.backdrop-tip { margin: 0; padding: 8px 12px; border-radius: 10px; background: rgba(21, 25, 36, 0.92); color: rgba(255, 255, 255, 0.92); font-size: 11px; letter-spacing: 0.02em; -webkit-app-region: no-drag; }
 .backdrop-tip kbd { margin: 0 3px; border-color: rgba(255,255,255,.2); background: rgba(255,255,255,.12); box-shadow: none; color: #fff; }
 .page-shortcut-hint { margin-left: 12px; color: rgba(255, 255, 255, 0.58); }
 .note-list-card { gap: 0; }
@@ -282,7 +286,7 @@ kbd {
     z-index: 1;
     padding: 13px 14px;
     background: var(--surface);
-    color: #858b98;
+    color: var(--muted);
     font-size: 10px;
     font-weight: 500;
 }
@@ -290,7 +294,7 @@ kbd {
 .note-table th.is-sortable { cursor: pointer; }
 .note-table th.is-sortable:hover { color: #5f6571; }
 .sortable-heading { display: inline-flex; align-items: center; gap: 6px; }
-.sort-indicator { color: var(--accent); font-size: 9px; }
+.sort-indicator { color: var(--accent-text); font-size: 9px; }
 .note-table th:first-child { width: 58%; }
 .note-table th:last-child { width: 44px; padding-right: 5px; padding-left: 5px; }
 .note-table td { padding: 13px 14px; border-top: 1px solid #f0f1f4; font-size: 12px; }
@@ -334,7 +338,7 @@ kbd {
 .note-open-button:disabled { cursor: wait; }
 .note-date-cell { color: var(--muted); font-family: 'Segoe UI', 'Yu Gothic UI', sans-serif; font-size: 11px !important; white-space: nowrap; }
 .note-list-message { margin: 0; padding: 24px 14px; color: var(--muted); font-size: 12px; text-align: center; }
-.note-list-message.is-error { color: #bd5a5a; }
+.note-list-message.is-error { color: var(--error); }
 .dialog-backdrop {
     position: fixed;
     z-index: 10;
@@ -373,18 +377,18 @@ kbd {
 .dialog-icon.is-danger { border-color: #f1d2cb; background: #fff0eb; }
 .dialog-icon.is-danger img { width: 19px; height: 19px; }
 .confirm-quit-dialog .dialog-icon.is-danger { border-color: #f0dfa7; background: #fff7df; color: #b1782c; }
-.dialog-save-error { margin: -12px 0 18px; color: #bd5a5a; font-size: 11px; line-height: 1.6; }
+.dialog-save-error { margin: -12px 0 18px; color: var(--error); font-size: 11px; line-height: 1.6; }
 .confirm-quit-dialog .dialog-icon.is-danger { color: #b1782c; }
 .dialog-eyebrow {
     margin: 0 0 7px;
-    color: #a0a4ae;
+    color: var(--muted);
     font-family: 'Segoe UI', sans-serif;
     font-size: 9px;
     font-weight: 700;
     letter-spacing: 0.15em;
 }
 .confirm-dialog h2 { margin: 0; color: #302d29; font-size: 17px; font-weight: 600; }
-.dialog-description { margin: 12px 0 24px; color: #777d89; font-size: 12px; line-height: 1.9; overflow-wrap: anywhere; }
+.dialog-description { margin: 12px 0 24px; color: var(--muted); font-size: 12px; line-height: 1.9; overflow-wrap: anywhere; }
 .dialog-actions { display: flex; justify-content: center; gap: 10px; }
 .dialog-actions button {
     min-height: 40px;
@@ -425,7 +429,7 @@ kbd {
     border-radius: 6px;
     background: rgba(254, 250, 221, 0.97);
     box-shadow: 0 2px 6px rgba(10, 13, 25, 0.08);
-    color: #777d89;
+    color: var(--muted);
     font-size: 9px;
     white-space: nowrap;
 }
@@ -468,7 +472,7 @@ kbd {
     line-height: 1;
 }
 .update-preview-controls { border-style: dashed; }
-.update-preview-label { color: #9a783e; font-weight: 700; }
+.update-preview-label { color: var(--warning-text); font-weight: 700; }
 .update-preview-controls select {
     min-width: 0;
     max-width: 130px;
